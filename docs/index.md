@@ -77,7 +77,7 @@ Use the pages in the left-hand navigation to move through the module materials.
 - [Week 5](lectures/week5/)
 
 ### Supporting pages
-- [Labs](labs.html)
+- [Labs](labs/)
 - [Assessment](assessment/)
 - [References](references/)
 
