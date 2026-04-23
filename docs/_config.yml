@@ -1,7 +1,11 @@
 title: Applied AI for Cybersecurity
-baseurl: "/applied-ai-for-cybersecurity"
+description: Level 6 course site with syllabus, weekly lectures, labs, assessment, and references
 url: "https://mo574216.github.io"
-theme: jekyll-theme-minimal
-relative_links:
-  enabled: true
-  collections: true
+baseurl: "/applied-ai-for-cybersecurity"
+
+remote_theme: just-the-docs/just-the-docs
+plugins:
+  - jekyll-remote-theme
+
+search_enabled: true
+color_scheme: light
