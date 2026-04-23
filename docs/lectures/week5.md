@@ -1,7 +1,7 @@
 ---
 title: "Week 5 — Trustworthy Deployment, Governance, and Capstone Case Study"
 layout: default
-permalink: "/docs/lectures/week5.html"
+permalink: "/lectures/week5/"
 ---
 
 # Week 5 — Trustworthy Deployment, Governance, and Capstone Case Study
