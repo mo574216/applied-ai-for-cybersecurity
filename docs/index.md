@@ -70,16 +70,16 @@ Use the pages in the left-hand navigation to move through the module materials.
 - [Schedule](schedule/)
 
 ### Weekly lectures
-- [Week 1](lectures/week1.html)
-- [Week 2](lectures/week2.html)
-- [Week 3](lectures/week3.html)
-- [Week 4](lectures/week4.html)
-- [Week 5](lectures/week5.html)
+- [Week 1](lectures/week1/)
+- [Week 2](lectures/week2/)
+- [Week 3](lectures/week3/)
+- [Week 4](lectures/week4/)
+- [Week 5](lectures/week5/)
 
 ### Supporting pages
 - [Labs](labs.html)
-- [Assessment](assessment.html)
-- [References](references.html)
+- [Assessment](assessment/)
+- [References](references/)
 
 ---
 
@@ -137,12 +137,12 @@ Students should engage with AI critically, responsibly, and transparently. Any u
 
 A sensible order for students is:
 
-1. read the [Syllabus](syllabus.html);
-2. check the [Schedule](schedule.html);
+1. read the [Syllabus](syllabus/);
+2. check the [Schedule](schedule/);
 3. work through the weekly lecture pages in order;
-4. follow the [Labs](labs.html) alongside the lectures;
-5. review the [Assessment](assessment.html) requirements early;
-6. use the [References](references.html) page for deeper reading.
+4. follow the [Labs](labs/) alongside the lectures;
+5. review the [Assessment](assessment/) requirements early;
+6. use the [References](references/) page for deeper reading.
 
 ---
 
