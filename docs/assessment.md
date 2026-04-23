@@ -2,7 +2,7 @@
 title: "Assessment"
 layout: default
 nav_order: 6
-permalink: "/docs/assessment/"
+permalink: "/assessment/"
 ---
 
 # Assessment
