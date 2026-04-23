@@ -2,7 +2,7 @@
 title: "Labs"
 layout: default
 nav_order: 5
-permalink: "/docs/labs/"
+permalink: "/labs/"
 ---
 
 # Labs
