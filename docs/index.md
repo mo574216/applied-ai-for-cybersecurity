@@ -66,8 +66,8 @@ Students are expected to have:
 Use the pages in the left-hand navigation to move through the module materials.
 
 ### Start here
-- [Syllabus](syllabus.html)
-- [Schedule](schedule.html)
+- [Syllabus](syllabus/)
+- [Schedule](schedule/)
 
 ### Weekly lectures
 - [Week 1](lectures/week1.html)
