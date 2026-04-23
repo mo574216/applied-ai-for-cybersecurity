@@ -1,7 +1,7 @@
 ---
 title: "Week 4 — Attacking and Defending AI Systems"
 layout: default
-permalink: "/docs/lectures/week4.html"
+permalink: "/lectures/week4/"
 ---
 
 # Week 4 — Attacking and Defending AI Systems
