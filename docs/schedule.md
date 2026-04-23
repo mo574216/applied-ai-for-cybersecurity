@@ -4,7 +4,6 @@ layout: default
 nav_order: 3
 permalink: "/schedule/"
 ---
-
 # Course Schedule
 
 ## Applied AI for Cybersecurity
