@@ -16,11 +16,11 @@ This page provides the week-by-week structure for the module.
 
 | Week | Topic | Main Focus | Practical / Academic Emphasis | Lecture Notes |
 |---|---|---|---|---|
-| 1 | Foundations of Applied AI for Cybersecurity | AI in cyber defence, security data, common use cases, problem framing, strengths and limitations of AI | Building a shared conceptual foundation for the rest of the module | [Week 1](../lectures/week1.html) |
-| 2 | Data, Features, and Classical Machine Learning for Security Analytics | Cyber datasets, preprocessing, feature engineering, supervised learning, anomaly detection, and evaluation metrics | Developing evidence-based model selection and interpretation skills | [Week 2](../lectures/week2.html) |
-| 3 | Deep Learning and Generative AI in Cybersecurity | Deep learning for cyber data, NLP for threat analysis, LLMs in SOC workflows, benefits and risks of GenAI | Exploring modern AI-enabled cyber workflows with critical awareness | [Week 3](../lectures/week3.html) |
-| 4 | Attacking and Defending AI Systems | Adversarial ML, evasion, poisoning, inference attacks, model misuse, prompt injection, and secure design principles | Understanding AI systems as security-critical and attackable assets | [Week 4](../lectures/week4.html) |
-| 5 | Trustworthy Deployment, Governance, and Capstone Case Study | Explainability, robustness, privacy, ethics, governance, assurance, and integrated case-based evaluation | Bringing together technical analysis with operational and professional judgement | [Week 5](../lectures/week5.html) |
+| 1 | Foundations of Applied AI for Cybersecurity | AI in cyber defence, security data, common use cases, problem framing, strengths and limitations of AI | Building a shared conceptual foundation for the rest of the module | [Week 1](../lectures/week1/) |
+| 2 | Data, Features, and Classical Machine Learning for Security Analytics | Cyber datasets, preprocessing, feature engineering, supervised learning, anomaly detection, and evaluation metrics | Developing evidence-based model selection and interpretation skills | [Week 2](../lectures/week2/) |
+| 3 | Deep Learning and Generative AI in Cybersecurity | Deep learning for cyber data, NLP for threat analysis, LLMs in SOC workflows, benefits and risks of GenAI | Exploring modern AI-enabled cyber workflows with critical awareness | [Week 3](../lectures/week3/) |
+| 4 | Attacking and Defending AI Systems | Adversarial ML, evasion, poisoning, inference attacks, model misuse, prompt injection, and secure design principles | Understanding AI systems as security-critical and attackable assets | [Week 4](../lectures/week4/) |
+| 5 | Trustworthy Deployment, Governance, and Capstone Case Study | Explainability, robustness, privacy, ethics, governance, assurance, and integrated case-based evaluation | Bringing together technical analysis with operational and professional judgement | [Week 5](../lectures/week5/) |
 
 ---
 
