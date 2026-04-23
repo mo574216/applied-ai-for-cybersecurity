@@ -1,7 +1,7 @@
 ---
 title: "Week 1 — Foundations of Applied AI for Cybersecurity"
 layout: default
-permalink: "/docs/lectures/week1.html"
+permalink: /lectures/week1/
 ---
 
 # Week 1 — Foundations of Applied AI for Cybersecurity
