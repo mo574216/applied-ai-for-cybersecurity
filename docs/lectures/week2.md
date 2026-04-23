@@ -1,7 +1,7 @@
 ---
 title: "Week 2 — Data, Features, and Classical Machine Learning for Security Analytics"
 layout: default
-permalink: "/docs/lectures/week2.html"
+permalink: "/lectures/week2/"
 ---
 
 # Week 2 — Data, Features, and Classical Machine Learning for Security Analytics
