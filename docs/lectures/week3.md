@@ -1,7 +1,7 @@
 ---
 title: "Week 3 — Deep Learning and Generative AI in Cybersecurity"
 layout: default
-permalink: "/docs/lectures/week3.html"
+permalink: "/lectures/week3/"
 ---
 
 # Week 3 — Deep Learning and Generative AI in Cybersecurity
