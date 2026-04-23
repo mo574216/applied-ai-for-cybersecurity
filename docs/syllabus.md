@@ -4,7 +4,6 @@ layout: default
 nav_order: 2
 permalink: "/syllabus/"
 ---
-
 # Applied AI for Cybersecurity
 
 ## Module Overview
