@@ -2,7 +2,7 @@
 title: "References"
 layout: default
 nav_order: 4
-permalink: "/docs/references/"
+permalink: "/references/"
 ---
 
 # References
