@@ -9,26 +9,6 @@ permalink: /lectures/ai-in-soc/
 
 ## From Noisy Alerts to Threat Decisions
 
-**Teaching Assessment: Applied AI for Cybersecurity**
-
-# Purpose of the Revised Lecture
-
-This revised version strengthens the lecture for a Level 6 undergraduate audience in cybersecurity. The original version introduced useful ideas, but the opening example, mini-case study, and activity were too similar. They all focused on the same pattern: unusual login, file download, and campus login. This made the lecture repetitive and reduced the technical depth.
-
-The revised design separates the teaching functions clearly:
-
-- The **opening hook** is now only a short two-slide triage puzzle.
-
-- The **main lecture body** explains SOC telemetry, AI pipelines, risk scoring, and limitations at a deeper level.
-
-- The **mini-case study** is now a higher-level multi-stage ransomware and cloud-exfiltration scenario.
-
-- The **interactive activity** asks students to build a threat hypothesis and justify a proportionate response.
-
-> **Teaching Point**
->
-> The central message is not simply that “AI detects anomalies”. The stronger Level 6 message is that AI helps the SOC convert heterogeneous telemetry into evidence-based, explainable, and proportionate threat decisions.
-
 # Lecture Overview
 
 A Security Operations Center, or **SOC**, monitors security telemetry, investigates suspicious activity, and coordinates incident response. Modern SOCs receive data from firewalls, identity systems, endpoints, cloud platforms, email gateways, vulnerability scanners, threat intelligence feeds, and network sensors.
@@ -47,7 +27,7 @@ AI is therefore used not as a magic detector, but as a decision-support layer th
 
 # Learning Objectives
 
-By the end of this lecture, students should be able to:
+By the end of this lecture, you should be able to:
 
 1.  Explain why AI is used in modern SOC environments.
 
@@ -85,11 +65,11 @@ Consider three alerts:
 | B | One successful login from a new country, followed by unusual access to cloud storage | Less noisy but potentially more damaging |
 | C | Malware signature detected on a quarantined test machine | Serious, but already contained |
 
-> **In-Class Question**
+> **Discussion question**
 >
-> **Question to students:** Which alert should the SOC analyst investigate first, and why?
+> Which alert should the SOC analyst investigate first, and why?
 
-## Slide 2: The Teaching Point
+## Slide 2: Key Idea
 
 Alert B should probably be investigated first because it combines several risk factors:
 
@@ -103,7 +83,7 @@ Alert B should probably be investigated first because it combines several risk f
 
 Alert A may be a blocked brute-force attempt. Alert C may sound serious, but the machine has already been quarantined. Alert B is dangerous because the attacker may already be inside.
 
-> **Teaching Point**
+> **Key idea**
 >
 > A SOC is not only an alert detector. A SOC is a decision system. AI is useful when it helps analysts decide which weak signals combine into a credible threat.
 
@@ -139,9 +119,9 @@ Successful login from unusual infrastructure
 = possible hands-on-keyboard intrusion
 ```
 
-> **Level 6 Depth Point**
+> **Advanced note**
 >
-> At Level 6, students should see the difference between **event detection** and **threat reasoning**. SOC work is not only classification; it is evidence construction under uncertainty.
+> A mature SOC view separates **event detection** from **threat reasoning**. SOC work is not only classification; it is evidence construction under uncertainty.
 
 # What AI Actually Sees
 
@@ -177,7 +157,7 @@ IP address -> associated with -> VPN provider or threat infrastructure
 
 This creates an **entity graph**. Graph-based reasoning can help detect suspicious relationships that are not obvious from one log line.
 
-> **Teaching Point**
+> **Key idea**
 >
 > A single event asks: “Is this log line suspicious?” A graph asks: “Does this relationship between user, device, process, resource, and destination make sense?”
 
@@ -196,22 +176,80 @@ This creates an **entity graph**. Graph-based reasoning can help detect suspicio
 
 # From Raw Logs to Threat Decisions
 
-The AI-assisted SOC pipeline can be represented as follows:
+The workflow below should be understood as a **practical SOC analytics and response workflow**. It is not a single official AI standard. It combines three widely used sources of practice:
+
+1. **NIST CSF 2.0 and NIST SP 800-61 Rev. 3** for incident-response thinking: govern, identify, protect, detect, respond, and recover.
+2. **MITRE ATT&CK** for mapping evidence to adversary tactics and techniques.
+3. **SIEM/SOAR practice** for collecting telemetry, correlating alerts, generating incidents, automating low-risk tasks, and supporting analyst investigation.
+
+The aim is not to teach that every SOC uses exactly the same pipeline. The aim is to show a practical way to move from raw logs to a defensible security decision.
+
+## A Practical SOC Analytics and Response Workflow
 
 ```text
-Raw telemetry
-  -> Collection and normalization
-  -> Enrichment with asset, identity, vulnerability, and threat intelligence context
-  -> Feature extraction and representation
-  -> Detection models
-  -> Correlation and risk scoring
-  -> Incident generation
-  -> Analyst investigation
-  -> Response decision
-  -> Feedback and model improvement
+1. Govern and prepare
+   -> define assets, roles, risk appetite, playbooks, and logging requirements
+
+2. Collect and normalize telemetry
+   -> ingest identity, endpoint, network, cloud, email, vulnerability, and threat-intelligence data
+
+3. Enrich and contextualize events
+   -> add asset criticality, user role, business context, threat intelligence, and vulnerability context
+
+4. Detect suspicious activity
+   -> use rules, anomaly detection, behavioural analytics, ML models, and threat-hunting queries
+
+5. Correlate alerts into incidents
+   -> connect weak signals across users, devices, processes, cloud resources, and time
+
+6. Map evidence to attacker behaviour
+   -> use MITRE ATT&CK tactics and techniques to explain what the attacker may be trying to do
+
+7. Prioritize and decide
+   -> assess likelihood, confidence, asset criticality, data sensitivity, and attack stage
+
+8. Respond and contain
+   -> apply proportionate response actions manually or through approved playbooks
+
+9. Recover and learn
+   -> restore normal operation, close detection gaps, update playbooks, and improve models
 ```
 
-## Step 1: Collection and Normalization
+> **Key idea**
+>
+> AI is mainly used in the middle of this workflow: detection, correlation, prioritization, summarization, and recommendation. Incident ownership, proportionality, legal responsibility, and business-risk decisions remain human and organizational responsibilities.
+
+## How This Relates to Recognised Practice
+
+| **Workflow Part** | **Recognised Practice Behind It** | **Meaning in the SOC** |
+|:------------------|:----------------------------------|:-----------------------|
+| Govern and prepare | NIST CSF 2.0; NIST SP 800-61 Rev. 3 | Decide what must be monitored, who is responsible, and what response procedures exist before an incident occurs. |
+| Collect and normalize | SIEM practice | Bring heterogeneous logs into a searchable and comparable structure. |
+| Enrich and contextualize | SIEM/SOAR and threat-intelligence practice | Add meaning to raw events using asset value, identity context, vulnerability data, and known indicators. |
+| Detect suspicious activity | SIEM analytics, EDR/XDR analytics, ML-based anomaly detection | Identify events or behaviours that may indicate compromise. |
+| Correlate alerts into incidents | SIEM/XDR incident management | Reduce alert noise by grouping related evidence into a single investigation object. |
+| Map to attacker behaviour | MITRE ATT&CK | Explain the evidence in terms of adversary objectives such as initial access, execution, persistence, discovery, exfiltration, and impact. |
+| Prioritize and decide | SOC triage and risk management | Decide what deserves urgent attention and what can be monitored or closed. |
+| Respond and contain | SOAR playbooks; incident-response procedures | Execute approved actions such as token revocation, endpoint isolation, blocking indicators, or ticket escalation. |
+| Recover and learn | NIST CSF Recover; post-incident improvement | Restore services, improve detections, update playbooks, and reduce future risk. |
+
+## Step 1: Govern and Prepare
+
+A SOC cannot make good decisions during an incident if the organization has not prepared before the incident. Preparation includes:
+
+```text
+- Which systems are critical?
+- Which logs must be collected?
+- Who owns each system?
+- Which actions can be automated?
+- Which actions require approval?
+- What evidence must be preserved?
+- Who must be informed during a serious incident?
+```
+
+For example, isolating a student lab machine may be low risk. Isolating a hospital system, payment system, or identity server may require senior approval.
+
+## Step 2: Collect and Normalize Telemetry
 
 Logs arrive in different formats. A firewall event, an identity event, an endpoint event, and a cloud API event do not look the same.
 
@@ -235,14 +273,14 @@ Cloud audit log:
 user_id, API_call, resource_name, object_id, access_time
 ```
 
-Normalization converts this heterogeneous data into a consistent structure so that it can be searched, correlated, and modelled.
+Normalization converts heterogeneous data into a consistent structure so that it can be searched, correlated, and modelled.
 
-## Step 2: Enrichment
+## Step 3: Enrich and Contextualize
 
-Raw events rarely contain enough meaning. The SOC enriches them:
+Raw events rarely contain enough meaning. The SOC enriches them with context:
 
 ```text
-IP address -> known malicious, residential VPN, Tor exit, cloud provider, normal country?
+IP address -> known malicious, residential VPN, Tor exit, cloud provider, usual country?
 User -> role, normal working hours, usual device, privilege level?
 Device -> managed or unmanaged, criticality, patch level, EDR status?
 File or resource -> public, internal, confidential, regulated?
@@ -250,62 +288,126 @@ Process -> signed binary, admin tool, suspicious command line?
 Cloud API call -> common for this user or rare and high-impact?
 ```
 
-## Step 3: Feature Extraction
+Context changes the interpretation of the same technical event.
 
-AI models usually do not operate directly on raw log text. They need measurable features.
+| **Event** | **Low-Risk Context** | **High-Risk Context** |
+|:----------|:---------------------|:----------------------|
+| PowerShell execution | Domain administrator during maintenance window | HR laptop after phishing click |
+| Large data transfer | Backup server to approved storage | Staff laptop to unknown external storage |
+| OAuth consent grant | Approved enterprise application | Unknown application requesting mailbox and file access |
+| New-country login | User is travelling with managed device | User is active locally at the same time |
 
-| **Feature Type** | **Example Feature**                    | **Why It Matters**                 |
-|:-----------------|:---------------------------------------|:-----------------------------------|
-| Frequency        | failed logins per minute               | Brute force or credential stuffing |
-| Rarity           | process rarity score for this host     | Unusual execution behaviour        |
-| Temporal         | activity outside user baseline         | Suspicious time pattern            |
-| Geo-spatial      | distance from usual login region       | Possible impossible travel         |
-| Sequence         | login then discovery then exfiltration | Multi-stage attack pattern         |
-| Graph-based      | unusual edge between user and resource | Abnormal relationship              |
-| Semantic         | suspicious command-line tokens         | Malicious use of legitimate tools  |
-| Contextual       | asset criticality and data sensitivity | Business impact                    |
+## Step 4: Detect Suspicious Activity
 
-## Step 4: Detection Models
+Detection can be rule-based, statistical, machine-learning-based, or hypothesis-driven through threat hunting.
 
-Different AI methods support different SOC tasks.
+| **Detection Method** | **Example** | **Strength** | **Limitation** |
+|:---------------------|:------------|:-------------|:---------------|
+| Rule-based detection | More than 100 failed logins in 5 minutes | Clear and explainable | Misses subtle attacks using valid credentials |
+| Signature detection | Known malware hash or known command pattern | Good for known threats | Weak against new or modified attacks |
+| Anomaly detection | User accesses a file share never accessed before | Useful for unknown behaviour | Can create many false positives |
+| Behavioural analytics | Login pattern differs from user baseline | Adds user/entity context | Needs historical data and tuning |
+| Graph analytics | Unusual relationship among user, device, process, and resource | Good for multi-stage attacks | Requires clean entity resolution |
+| Threat hunting | Analyst searches for encoded PowerShell after phishing wave | Flexible and hypothesis-driven | Requires skilled analysts |
+| LLM-assisted analysis | Summarise evidence and suggest investigation questions | Useful for explanation and productivity | Must be checked; may hallucinate |
 
-| **Method**                     | **Typical SOC Use**                                  | **Main Risk**                           |
-|:-------------------------------|:-----------------------------------------------------|:----------------------------------------|
-| Supervised learning            | Classify known malicious and benign examples         | Poor generalization to new attacks      |
-| Unsupervised anomaly detection | Detect rare behaviour without many labels            | Many false positives                    |
-| Semi-supervised learning       | Learn normal behaviour, flag deviations              | Concept drift                           |
-| Graph analytics                | Detect suspicious entity relationships               | Data integration complexity             |
-| Sequence models                | Detect abnormal order of events                      | Requires good temporal data             |
-| LLMs                           | Summarize incidents, explain evidence, assist triage | Hallucination and over-trust            |
-| Reinforcement learning         | Support adaptive response policies                   | Unsafe exploration in real environments |
+## Step 5: Correlate Alerts into Incidents
 
-## Step 5: Correlation and Risk Scoring
+A mature SOC should not treat each alert as independent. The important question is:
 
-A mature SOC should not treat each event as independent. It should ask:
+> Do multiple weak signals combine into a credible threat hypothesis?
 
-> Do multiple weak signals combine into a strong threat hypothesis?
+Example:
 
-A simplified risk score can be expressed as:
+```text
+Weak signal 1: phishing email clicked
+Weak signal 2: successful login from unusual infrastructure
+Weak signal 3: unknown OAuth consent grant
+Weak signal 4: encoded PowerShell on endpoint
+Weak signal 5: rare file-share access
+Weak signal 6: external upload
+Weak signal 7: backup deletion attempt
 
-$$\text{Risk} = f(\text{likelihood}, \text{confidence}, \text{asset criticality}, \text{data sensitivity}, \text{attack stage})$$
+Correlated incident:
+Possible account compromise progressing toward data exfiltration and ransomware impact.
+```
 
-For teaching purposes, this can be simplified:
+The purpose of correlation is to reduce noise and create a meaningful investigation object.
 
-$$\text{Risk Score} = 0.35A + 0.25B + 0.20C + 0.20D$$
+## Step 6: Map Evidence to Attacker Behaviour
 
-where:
+MITRE ATT&CK helps the SOC describe what the attacker may be trying to achieve.
 
-- $A$ = anomaly strength;
+| **ATT&CK-Style Objective** | **Possible Evidence** | **SOC Question** |
+|:---------------------------|:----------------------|:-----------------|
+| Initial access | Phishing click, malicious attachment, stolen credentials | How did the attacker enter? |
+| Execution | Encoded PowerShell, suspicious script, unusual process tree | What code or command was run? |
+| Persistence | OAuth consent grant, new scheduled task, new service | Can the attacker return later? |
+| Credential access | Password dumping, suspicious token use, MFA fatigue | Are more accounts compromised? |
+| Discovery | Network scanning, file-share enumeration | What is the attacker looking for? |
+| Lateral movement | Remote login, SMB access, RDP, admin shares | Has the attacker moved beyond the first host? |
+| Collection | Archive creation, unusual access to sensitive folders | What data is being prepared? |
+| Exfiltration | External upload, unusual cloud transfer, DNS tunnelling | Has data left the organization? |
+| Impact | Backup deletion, encryption behaviour, service disruption | Is ransomware or destructive action underway? |
 
-- $B$ = confidence in evidence;
+This mapping improves communication. Instead of saying “there are seven alerts,” the analyst can say:
 
-- $C$ = asset or data criticality;
+> The evidence suggests initial access, execution, collection, possible exfiltration, and preparation for impact.
 
-- $D$ = attack-stage severity.
+## Step 7: Prioritize and Decide
 
-> **Level 6 Depth Point**
->
-> The model score is not the decision. The decision also depends on business impact, legal context, operational risk, and confidence in the evidence.
+Prioritization should not depend only on the model score. A practical SOC decision considers:
+
+```text
+- likelihood that the activity is malicious;
+- confidence and quality of the evidence;
+- criticality of the affected asset or account;
+- sensitivity of the data involved;
+- current attack stage;
+- potential business disruption caused by response;
+- reversibility of the proposed action;
+- legal, regulatory, and reporting implications.
+```
+
+A simple classroom scoring model can help discussion, but it is not an industry standard formula. In practice, each organization tunes severity according to its own assets, risks, and response procedures.
+
+| **Priority Factor** | **Low Priority Example** | **High Priority Example** |
+|:--------------------|:-------------------------|:--------------------------|
+| Asset criticality | Test machine | Identity server or finance system |
+| Account privilege | Standard user | Domain administrator or cloud administrator |
+| Evidence confidence | One weak anomaly | Multiple independent telemetry sources |
+| Attack stage | Scanning attempt | Exfiltration or backup deletion |
+| Response risk | Reversible enrichment query | Isolating a production server |
+
+## Step 8: Respond and Contain
+
+Response should be proportionate to evidence and risk. SOAR playbooks can automate routine, reversible, and low-risk tasks.
+
+| **Usually Safe to Automate** | **Usually Requires Human Approval** |
+|:----------------------------|:------------------------------------|
+| Enrich IP address or domain | Disable administrator account |
+| Collect related logs | Isolate production server |
+| Create incident ticket | Block business-critical traffic |
+| Group duplicate alerts | Terminate cloud workloads |
+| Query threat intelligence | Delete files or revoke broad permissions |
+| Notify analyst channel | Report breach externally |
+
+Automation is useful, but uncontrolled automation can create outages or destroy evidence.
+
+## Step 9: Recover and Learn
+
+The workflow does not end when the attacker is contained. A mature SOC asks:
+
+```text
+- What was the root cause?
+- Which controls failed?
+- Which detections worked?
+- Which detections were missing?
+- Did response actions create unnecessary disruption?
+- Should playbooks, rules, models, or training be updated?
+```
+
+This feedback loop turns an incident into improved resilience.
 
 # Why Accuracy Alone Is Not Enough
 
@@ -326,27 +428,23 @@ Then:
 | False positives | approximately 999 benign events incorrectly alerted |
 | Precision       | $95 / (95 + 999) \approx 8.7\%$                     |
 
-> **In-Class Question**
+> **Discussion question**
 >
-> **Question to students:** Why can a model with a low false positive rate still overwhelm the SOC?
+> Why can a model with a low false positive rate still overwhelm the SOC?
 >
-> **Expected answer:** Because benign events are far more common than malicious events. Even a small false positive rate can generate many false alerts.
+> **Suggested answer:** Because benign events are far more common than malicious events. Even a small false positive rate can generate many false alerts.
 
-> **Teaching Point**
+> **Key idea**
 >
-> For SOC evaluation, students should consider precision, recall, false positive cost, false negative cost, time-to-detect, time-to-triage, explainability, and response impact.
+> For SOC evaluation, consider precision, recall, false positive cost, false negative cost, time-to-detect, time-to-triage, explainability, and response impact.
 
 # Higher-Level Mini-Case: Multi-Stage Ransomware and Cloud Exfiltration
-
-> **Case Focus**
->
-> This case is intentionally different from the short opening hook. The opening hook teaches prioritization. This mini-case teaches multi-stage reasoning, telemetry fusion, adversary tactics, and response trade-offs.
 
 ## Scenario
 
 A university department is targeted by an attacker. The attacker begins with phishing, obtains valid credentials, abuses cloud access, moves laterally through the network, stages sensitive research data, and then prepares for ransomware impact.
 
-This scenario is more advanced than a simple unusual-login case because it requires students to reason across identity, email, endpoint, network, and cloud evidence.
+This scenario is more advanced than a simple unusual-login case because it requires reasoning across identity, email, endpoint, network, and cloud evidence.
 
 ## Timeline of Evidence
 
@@ -362,7 +460,7 @@ This scenario is more advanced than a simple unusual-login case because it requi
 
 ## Mapping to Adversary Behaviour
 
-Students should not only list events. They should map evidence to attacker objectives.
+Do not only list events. Map the evidence to attacker objectives.
 
 | **Adversary Objective**    | **Evidence in the Case**                | **Relevant SOC Question**                                         |
 |:---------------------------|:----------------------------------------|:------------------------------------------------------------------|
@@ -373,9 +471,9 @@ Students should not only list events. They should map evidence to attacker objec
 | Exfiltration               | Upload to external storage service      | Was sensitive data transferred outside the organization?          |
 | Impact                     | Backup deletion attempts                | Is ransomware deployment imminent?                                |
 
-> **Teaching Point**
+> **Key idea**
 >
-> This case encourages students to think in terms of a threat hypothesis: “The attacker is moving from valid account access toward data theft and ransomware impact.”
+> This case encourages threat-hypothesis thinking: “The attacker is moving from valid account access toward data theft and ransomware impact.”
 
 ## What the AI System Does
 
@@ -430,23 +528,23 @@ The analyst should validate:
 
 7.  What containment action is proportionate to the evidence and business impact?
 
-> **Level 6 Depth Point**
+> **Advanced note**
 >
-> This is the correct depth for Level 6: students should connect technical evidence, attacker behaviour, model output, and operational response.
+> A strong analysis connects technical evidence, attacker behaviour, model output, and operational response.
 
 # Interactive Activity: Build a Threat Hypothesis
 
 ## Activity Goal
 
-Students practise SOC reasoning by constructing a threat hypothesis from incomplete evidence. They must avoid two weak answers:
+Construct a threat hypothesis from incomplete evidence. Avoid two weak responses:
 
 - **Overreaction:** “Disable everything immediately.”
 
 - **Underreaction:** “It is only one suspicious login.”
 
-## Student Task
+## Activity Questions
 
-Working in pairs, students answer the following:
+Work through the following questions:
 
 1.  Which evidence items are weak signals, and which are strong signals?
 
@@ -460,15 +558,17 @@ Working in pairs, students answer the following:
 
 6.  What additional evidence would reduce uncertainty?
 
-## Expected High-Quality Student Answer
+## Example High-Quality Answer
 
 A strong answer should say something like:
 
 > The case suggests a multi-stage intrusion rather than a single anomalous login. The phishing click and valid login are early signals. The OAuth consent grant increases concern because token access may survive password reset. Encoded PowerShell, rare file share access, archive creation, external upload, and backup deletion attempts together support a high-confidence hypothesis of data theft followed by ransomware preparation. Immediate containment is justified, but destructive actions should be controlled and evidence should be preserved.
 
-## Possible Risk-Scoring Exercise
+## Illustrative Risk-Prioritization Exercise
 
-Ask students to score the case from 0 to 5 for each dimension:
+The following exercise is a simplified classroom model, not a standard industry formula. It is included to help reason about why the case deserves urgent escalation.
+
+Score the case from 0 to 5 for each dimension:
 
 | **Dimension**          | **Score** | **Reason**                                                                 |
 |:-----------------------|:----------|:---------------------------------------------------------------------------|
@@ -477,7 +577,7 @@ Ask students to score the case from 0 to 5 for each dimension:
 | Asset/data criticality | 4         | Research files and institutional data may be sensitive                     |
 | Attack-stage severity  | 5         | Evidence reaches exfiltration and possible impact phase                    |
 
-Using the simple formula:
+Using the illustrative classroom formula:
 
 $$\text{Risk Score} = 0.35A + 0.25B + 0.20C + 0.20D$$
 
@@ -485,11 +585,11 @@ we get:
 
 $$0.35(5) + 0.25(4) + 0.20(4) + 0.20(5) = 4.55/5$$
 
-This supports urgent escalation.
+This supports urgent escalation in this teaching scenario. In a real SOC, severity would also depend on the organisation's own playbooks, business impact, and evidence-handling rules.
 
 # Why AI Fails in SOC Environments
 
-AI is useful, but it fails in predictable ways. A cybersecurity graduate should be able to explain these failure modes.
+AI is useful, but it fails in predictable ways. These failure modes are important in real SOC environments.
 
 ## Failure 1: Missing or Poor-Quality Data
 
@@ -568,7 +668,7 @@ The alert was a false positive.
 A production outage cannot be fixed quickly.
 ```
 
-> **Teaching Point**
+> **Key idea**
 >
 > In cybersecurity, false negatives may allow attacks, but false positives can also disrupt the organization. Good SOC design must balance both.
 
@@ -639,31 +739,31 @@ Delete files
 Report breach externally
 ```
 
-# In-Lecture Q&A Prompts
+# Review Questions
 
 ## Q1. Why is the most obvious alert not always the most dangerous alert?
 
-**Expected answer:** Because a noisy alert may be blocked or contained, while a less obvious successful compromise may create greater risk.
+**Suggested answer:** Because a noisy alert may be blocked or contained, while a less obvious successful compromise may create greater risk.
 
 ## Q2. What is the difference between an alert and an incident?
 
-**Expected answer:** An alert is usually a warning signal from one source. An incident is a correlated set of evidence that suggests a meaningful security problem requiring response.
+**Suggested answer:** An alert is usually a warning signal from one source. An incident is a correlated set of evidence that suggests a meaningful security problem requiring response.
 
 ## Q3. Why is an OAuth consent grant dangerous in the mini-case?
 
-**Expected answer:** Because it may give an attacker persistent cloud access through tokens or application permissions, even if the user password is later changed.
+**Suggested answer:** Because it may give an attacker persistent cloud access through tokens or application permissions, even if the user password is later changed.
 
 ## Q4. Why can a 95% accurate model still be operationally poor?
 
-**Expected answer:** Because attacks are rare. A small false positive rate can still produce many false alerts and overwhelm analysts.
+**Suggested answer:** Because attacks are rare. A small false positive rate can still produce many false alerts and overwhelm analysts.
 
 ## Q5. Why should a SOC map evidence to attacker tactics?
 
-**Expected answer:** It helps analysts understand attacker objectives, identify missing evidence, prioritize response, and communicate findings using a common language.
+**Suggested answer:** It helps analysts understand attacker objectives, identify missing evidence, prioritize response, and communicate findings using a common language.
 
 ## Q6. What should be automated, and what should remain human-controlled?
 
-**Expected answer:** Evidence collection, enrichment, alert grouping, and ticket creation can often be automated. High-impact containment actions should usually require human approval.
+**Suggested answer:** Evidence collection, enrichment, alert grouping, and ticket creation can often be automated. High-impact containment actions should usually require human approval.
 
 # Final Takeaway
 
@@ -708,27 +808,4 @@ AI in the SOC:
 <https://learn.microsoft.com/en-us/azure/sentinel/>
 ```
 
-# Optional Instructor Notes for a 10–15 Minute Teaching Assessment
 
-A possible timing is:
-
-| **Section**                                              | **Time**  |
-|:---------------------------------------------------------|:----------|
-| Opening triage puzzle: two-slide hook                    | 2 minutes |
-| Why AI is used in SOC and what AI sees                   | 2 minutes |
-| Pipeline: telemetry to features to risk scoring          | 3 minutes |
-| Mini-case: multi-stage ransomware and cloud exfiltration | 4 minutes |
-| Interactive threat-hypothesis question                   | 2 minutes |
-| Why AI fails and final takeaway                          | 2 minutes |
-
-For a teaching assessment, do not try to present every table in detail. Use the tables as structured teaching material, but select the most important points verbally. The strongest delivery strategy is:
-
-1.  Start with the short triage puzzle.
-
-2.  Move quickly to the idea that SOC work is evidence construction.
-
-3.  Use the ransomware mini-case as the main example.
-
-4.  Ask students to justify a threat hypothesis.
-
-5.  End with the human-in-the-loop principle.
