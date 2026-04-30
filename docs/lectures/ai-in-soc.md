@@ -5,865 +5,730 @@ nav_order: 6
 permalink: /lectures/ai-in-soc/
 ---
 
-# AI in the Security Operations Center  
+# AI in the Security Operations Center
+
 ## From Noisy Alerts to Threat Decisions
 
----
+**Teaching Assessment: Applied AI for Cybersecurity**
 
-## 1. Lecture Overview
+# Purpose of the Revised Lecture
 
-Security Operations Centers, usually called **SOCs**, are responsible for detecting, investigating, and responding to cyber threats. Modern SOCs receive large volumes of security data from firewalls, endpoint agents, identity systems, cloud platforms, email gateways, intrusion detection systems, and network monitoring tools.
+This revised version strengthens the lecture for a Level 6 undergraduate audience in cybersecurity. The original version introduced useful ideas, but the opening example, mini-case study, and activity were too similar. They all focused on the same pattern: unusual login, file download, and campus login. This made the lecture repetitive and reduced the technical depth.
 
-The central problem is not only that organizations are attacked. The central problem is that security teams must make decisions under **high volume**, **high uncertainty**, and **high time pressure**.
+The revised design separates the teaching functions clearly:
 
-This lecture explains how artificial intelligence can support SOC analysts by helping them move from noisy alerts to meaningful threat decisions.
+- The **opening hook** is now only a short two-slide triage puzzle.
 
----
+- The **main lecture body** explains SOC telemetry, AI pipelines, risk scoring, and limitations at a deeper level.
 
-## 2. Learning Objectives
+- The **mini-case study** is now a higher-level multi-stage ransomware and cloud-exfiltration scenario.
+
+- The **interactive activity** asks students to build a threat hypothesis and justify a proportionate response.
+
+> **Teaching Point**
+>
+> The central message is not simply that “AI detects anomalies”. The stronger Level 6 message is that AI helps the SOC convert heterogeneous telemetry into evidence-based, explainable, and proportionate threat decisions.
+
+# Lecture Overview
+
+A Security Operations Center, or **SOC**, monitors security telemetry, investigates suspicious activity, and coordinates incident response. Modern SOCs receive data from firewalls, identity systems, endpoints, cloud platforms, email gateways, vulnerability scanners, threat intelligence feeds, and network sensors.
+
+The challenge is not only that organizations face attacks. The operational challenge is that defenders must make decisions under:
+
+- **high volume**: thousands or millions of events per day;
+
+- **high uncertainty**: incomplete and sometimes contradictory evidence;
+
+- **high speed**: attackers may move from initial access to impact in minutes or hours;
+
+- **high consequence**: both missed attacks and unnecessary containment can harm the organization.
+
+AI is therefore used not as a magic detector, but as a decision-support layer that helps analysts prioritize, correlate, enrich, explain, and respond.
+
+# Learning Objectives
 
 By the end of this lecture, students should be able to:
 
-1. Explain why AI is used in modern SOC environments.
-2. Identify the types of telemetry that AI-based SOC systems analyze.
-3. Describe the pipeline from raw security logs to threat decisions.
-4. Explain how AI helps correlate weak signals into stronger evidence.
-5. Discuss why AI-based detection systems fail.
-6. Understand the importance of human judgment in AI-assisted incident response.
-7. Apply SOC reasoning to a mini case study involving account compromise.
+1.  Explain why AI is used in modern SOC environments.
 
----
+2.  Distinguish between raw telemetry, features, alerts, incidents, and response decisions.
 
-# 3. Opening Hook: Which Alert Is the Real Attack?
+3.  Map SOC telemetry to adversary behaviour using a framework such as MITRE ATT&CK.
 
-Imagine the following situation.
+4.  Explain how AI-based systems perform alert prioritization, anomaly detection, event correlation, and risk scoring.
 
-It is **02:17 a.m.**.  
-The SOC dashboard shows **1,248 alerts** from different security tools:
+5.  Analyse why accuracy alone is a poor evaluation measure for SOC models.
 
-- Firewalls
-- Endpoint detection tools
-- Cloud logs
-- Identity systems
-- Email security gateways
-- Intrusion detection systems
-- Threat intelligence feeds
+6.  Construct a threat hypothesis from incomplete evidence in a multi-stage attack scenario.
 
-A human analyst cannot investigate all of them manually.
+7.  Evaluate when response should be automated and when human approval is required.
 
-The real question is not:
+# Opening Hook: Which Alert Deserves Human Attention?
 
-> Can we detect everything?
+## Slide 1: The Triage Problem
 
-The real question is:
+It is **02:17 a.m.**. The SOC dashboard shows **1,248 alerts**. A human analyst cannot investigate all of them manually.
+
+The practical SOC question is not:
+
+> Can we detect every suspicious event?
+
+The practical SOC question is:
 
 > Which few events deserve human attention now?
 
----
-
-## Opening Scenario
-
-Consider these three alerts:
+Consider three alerts:
 
 | Alert | Description | First Impression |
-|---|---|---|
-| A | 300 failed login attempts from one IP address | Looks suspicious |
-| B | One successful login from a new country, followed by cloud file downloads | More dangerous |
-| C | Malware signature detected on a quarantined test machine | Already contained |
+|:------|:------------|:-----------------|
+| A | 300 failed logins from one external IP address | Very noisy and suspicious |
+| B | One successful login from a new country, followed by unusual access to cloud storage | Less noisy but potentially more damaging |
+| C | Malware signature detected on a quarantined test machine | Serious, but already contained |
 
----
+> **In-Class Question**
+>
+> **Question to students:** Which alert should the SOC analyst investigate first, and why?
 
-## In-Class Question 1
+## Slide 2: The Teaching Point
 
-**Question:**  
-Which alert should the SOC analyst investigate first?
+Alert B should probably be investigated first because it combines several risk factors:
 
-**Possible Answer:**  
-Alert **B** should probably be investigated first.
+- the access was successful;
 
-Why?
+- the location is unusual;
 
-Because it combines several dangerous signs:
+- the account reached cloud storage;
 
-- The login was successful.
-- The login came from an unusual country.
-- The account accessed cloud files.
-- The activity may indicate data exfiltration.
+- the potential impact may involve data exposure.
 
-Alert A is noisy and suspicious, but it may simply be a blocked brute-force attempt.  
-Alert C may look serious, but the machine is already quarantined.
+Alert A may be a blocked brute-force attempt. Alert C may sound serious, but the machine has already been quarantined. Alert B is dangerous because the attacker may already be inside.
 
----
+> **Teaching Point**
+>
+> A SOC is not only an alert detector. A SOC is a decision system. AI is useful when it helps analysts decide which weak signals combine into a credible threat.
 
-## Key Teaching Point
+# Why AI Is Used in the SOC
 
-A SOC does not only detect alerts.
+AI is used because the SOC faces a mismatch between the scale of machine-generated telemetry and the limited attention of human analysts.
 
-A SOC must decide:
+| **SOC Problem**           | **Why It Is Difficult**                    | **How AI Can Help**                                                      |
+|:--------------------------|:-------------------------------------------|:-------------------------------------------------------------------------|
+| Alert fatigue             | Many alerts are low quality or duplicated  | Cluster, suppress, deduplicate, and prioritize alerts                    |
+| Multi-stage attacks       | One event may look harmless in isolation   | Correlate weak signals across time, users, devices, and services         |
+| Changing normal behaviour | Static rules become outdated               | Learn behavioural baselines and detect deviations                        |
+| Subtle attacker behaviour | Attackers avoid obvious signatures         | Detect rare sequences, low-and-slow activity, and abnormal relationships |
+| Heterogeneous evidence    | Logs come from different tools and formats | Normalize, enrich, and connect evidence                                  |
+| Operational risk          | Wrong response can disrupt business        | Support proportionate response using risk and confidence                 |
 
-> Which alerts matter most, and what action should be taken?
+## Rules Are Necessary but Not Sufficient
 
-AI is useful because it can help analysts connect weak signals and prioritize risk.
-
----
-
-# 4. Why AI Is Used in the SOC
-
-AI is used in the SOC because modern cyber defense faces a serious mismatch between:
-
-- The amount of security data generated by modern systems
-- The limited attention and time of human analysts
-
-A medium or large organization may generate millions of events every day. Most of them are benign. Some are suspicious. A small number may indicate real attacks.
-
-The challenge is to find the meaningful signals hidden inside the noise.
-
----
-
-## 4.1 The Main SOC Problems
-
-| SOC Problem | Why It Is Difficult | How AI Can Help |
-|---|---|---|
-| Too many alerts | Analysts suffer from alert fatigue | AI can prioritize and group alerts |
-| Attacks are multi-stage | One event may look harmless alone | AI can correlate events over time |
-| Normal behavior changes | Static rules become outdated | AI can learn behavioral baselines |
-| Attackers behave subtly | They avoid obvious signatures | AI can detect anomalies and rare patterns |
-| Response must be fast | Manual triage is slow | AI can automate enrichment and suggest actions |
-| Data comes from many tools | Logs are heterogeneous | AI can help unify and interpret evidence |
-
----
-
-## 4.2 A Simple Example
-
-A traditional rule may say:
+A traditional rule might be:
 
 ```text
-If failed_login_count > 100, generate alert.
+IF failed_login_count > 100 THEN create_alert
 ```
 
-This rule may detect brute-force attacks, but it may miss a more subtle attack:
+This can detect brute-force attacks, but it may miss more realistic attacks where the adversary already has valid credentials:
 
 ```text
-One successful login from an unusual location
-+ access to sensitive files
-+ large download
-+ login from another country ten minutes later
+Successful login from unusual infrastructure
++ abnormal cloud API calls
++ rare process execution on endpoint
++ unusual SMB access to file server
++ staged archive uploaded to external service
+= possible hands-on-keyboard intrusion
 ```
 
-Each event alone may be weak.
+> **Level 6 Depth Point**
+>
+> At Level 6, students should see the difference between **event detection** and **threat reasoning**. SOC work is not only classification; it is evidence construction under uncertainty.
 
-Together, they may strongly indicate account compromise.
+# What AI Actually Sees
 
----
+AI does not directly see attackers, motives, or intentions. It sees traces left in telemetry.
 
-## 4.3 Teaching Sentence
+## SOC Telemetry Sources
 
-> AI helps the SOC move from isolated alerts to connected evidence.
+| **Data Source**     | **Examples of Evidence**                                                                   |
+|:--------------------|:-------------------------------------------------------------------------------------------|
+| Identity logs       | login time, source IP, device, MFA result, privilege changes, impossible travel            |
+| Endpoint telemetry  | process execution, parent-child process relationship, command-line arguments, file changes |
+| Network logs        | flows, ports, protocols, traffic volume, east-west movement, unusual destinations          |
+| DNS logs            | rare domains, newly registered domains, domain generation patterns                         |
+| Email logs          | sender reputation, attachments, URLs, user clicks, phishing indicators                     |
+| Cloud audit logs    | API calls, object storage access, token use, VM creation, IAM changes                      |
+| Proxy and web logs  | external uploads, downloads, category of destination service                               |
+| Threat intelligence | known malicious IPs, domains, hashes, adversary infrastructure                             |
+| Asset inventory     | criticality of server, owner, business function, exposure, patch level                     |
+| Vulnerability data  | known exploitable weaknesses and missing controls                                          |
 
-This is the main idea of the lecture.
+## From Events to Entities and Relationships
 
----
+A mature AI-assisted SOC should not treat logs as disconnected rows. It should connect entities:
 
-# 5. What AI Actually Sees
+```text
+User  -> logs into -> Cloud service
+User  -> uses      -> Device
+Device -> connects to -> File server
+Process -> spawns -> PowerShell
+Device -> uploads to -> External service
+IP address -> associated with -> VPN provider or threat infrastructure
+```
 
-AI does not directly see attackers.
+This creates an **entity graph**. Graph-based reasoning can help detect suspicious relationships that are not obvious from one log line.
 
-AI sees traces left by attackers.
+> **Teaching Point**
+>
+> A single event asks: “Is this log line suspicious?” A graph asks: “Does this relationship between user, device, process, resource, and destination make sense?”
 
-These traces are captured as security telemetry.
+## Context Changes Meaning
 
----
+| **Event**                       | **Context**                                     | **Interpretation** |
+|:--------------------------------|:------------------------------------------------|:-------------------|
+| Large data transfer at midnight | Backup server                                   | Possibly normal    |
+| Large data transfer at midnight | HR laptop                                       | Suspicious         |
+| PowerShell execution            | System administrator workstation                | Possibly normal    |
+| PowerShell execution            | Reception desk computer                         | Suspicious         |
+| Login from new country          | User is travelling and uses managed device      | Possibly normal    |
+| Login from new country          | User is active locally at the same time         | Highly suspicious  |
+| OAuth consent grant             | Approved enterprise app                         | Possibly normal    |
+| OAuth consent grant             | Unknown app asking for mailbox and files access | Suspicious         |
 
-## 5.1 Security Telemetry Sources
+# From Raw Logs to Threat Decisions
 
-| Data Source | Example |
-|---|---|
-| Network logs | IP addresses, ports, protocols, traffic volume |
-| Firewall logs | Allowed and blocked connections |
-| DNS logs | Domain lookups, suspicious domains |
-| Endpoint telemetry | Process execution, file changes, command-line activity |
-| Identity logs | Login time, location, MFA status, privilege changes |
-| Cloud logs | API calls, storage access, VM creation |
-| Email security logs | Phishing links, attachments, sender reputation |
-| Threat intelligence | Malicious IPs, domains, file hashes |
-| Asset inventory | Critical server, student laptop, administrator workstation |
-| Vulnerability data | Known weaknesses on hosts or applications |
-
----
-
-## 5.2 Important Concept: Context
-
-The same event can mean different things depending on context.
-
-Example:
-
-| Event | Context | Interpretation |
-|---|---|---|
-| Large file transfer at midnight | Backup server | Possibly normal |
-| Large file transfer at midnight | HR employee laptop | Suspicious |
-| PowerShell execution | System administrator workstation | Possibly normal |
-| PowerShell execution | Reception desk computer | Suspicious |
-| Login from another country | User is travelling | Possibly normal |
-| Login from another country | User is currently on campus | Highly suspicious |
-
----
-
-## In-Class Question 2
-
-**Question:**  
-Can AI detect an attacker’s intention?
-
-**Expected Answer:**  
-No. AI cannot directly observe intention. It detects observable traces such as:
-
-- Login behavior
-- File access
-- Network flows
-- Process execution
-- Command-line patterns
-- Deviations from normal behavior
-
-AI estimates risk based on evidence. It does not read the attacker’s mind.
-
----
-
-# 6. From Raw Logs to Threat Decisions
-
-The AI-assisted SOC process can be understood as a pipeline.
+The AI-assisted SOC pipeline can be represented as follows:
 
 ```text
 Raw telemetry
-     ↓
-Collection and normalization
-     ↓
-Enrichment with context
-     ↓
-Feature extraction and representation
-     ↓
-Detection model
-     ↓
-Correlation and risk scoring
-     ↓
-Alert or incident generation
-     ↓
-Analyst investigation
-     ↓
-Response decision
-     ↓
-Feedback and model improvement
+  -> Collection and normalization
+  -> Enrichment with asset, identity, vulnerability, and threat intelligence context
+  -> Feature extraction and representation
+  -> Detection models
+  -> Correlation and risk scoring
+  -> Incident generation
+  -> Analyst investigation
+  -> Response decision
+  -> Feedback and model improvement
 ```
 
----
+## Step 1: Collection and Normalization
 
-# 7. Detection Pipeline
-
-## 7.1 Step 1: Collection and Normalization
-
-Security data comes from many different sources.
-
-Examples:
+Logs arrive in different formats. A firewall event, an identity event, an endpoint event, and a cloud API event do not look the same.
 
 ```text
 Firewall log:
 src_ip, dst_ip, port, protocol, action
+```
 
+```text
 Identity log:
-username, login_time, login_location, MFA_result
+user_id, login_time, source_ip, MFA_result, device_id
+```
 
+```text
 Endpoint log:
-process_name, parent_process, command_line, file_hash
-
-Cloud log:
-user_id, API_call, resource_name, access_time
+host_id, process_name, parent_process, command_line, file_hash
 ```
-
-Before AI can analyze the data, the SOC must collect and normalize these logs.
-
-Normalization means converting different log formats into a consistent structure.
-
----
-
-## 7.2 Step 2: Enrichment
-
-Raw logs are often not enough.
-
-The SOC enriches events with additional context.
-
-Examples:
 
 ```text
-IP address → Is it known as malicious?
-
-User → Is this normal working time for the user?
-
-Host → Is this a critical server or a normal workstation?
-
-Process → Is this a known administration tool or suspicious execution?
-
-File → Is this file sensitive?
-
-Location → Is this login geographically unusual?
+Cloud audit log:
+user_id, API_call, resource_name, object_id, access_time
 ```
 
----
+Normalization converts this heterogeneous data into a consistent structure so that it can be searched, correlated, and modelled.
 
-## 7.3 Step 3: Feature Extraction
+## Step 2: Enrichment
 
-AI models do not usually work directly on raw logs.  
-They need features.
-
-A feature is a measurable representation of behavior.
-
-| Raw Event | Possible Feature |
-|---|---|
-| 50 failed logins in 2 minutes | login_failure_rate |
-| Login from a new country | geo_distance_from_usual_location |
-| PowerShell with encoded command | suspicious_command_pattern |
-| Large outbound traffic | data_transfer_volume |
-| Rare process relationship | process_anomaly_score |
-| Access to unusual file type | abnormal_file_access_score |
-| DNS query to rare domain | domain_rarity_score |
-
----
-
-## 7.4 Step 4: Detection Model
-
-Different AI methods can be used in SOC detection.
-
-| AI Method | Typical SOC Use |
-|---|---|
-| Supervised learning | Classify known malicious and benign events |
-| Unsupervised anomaly detection | Detect rare or unusual behavior |
-| Semi-supervised learning | Learn from mostly normal data |
-| Graph analytics | Detect suspicious relationships among users, devices, and IPs |
-| Sequence models | Detect abnormal order of events |
-| Large language models | Summarize incidents and assist investigation |
-| Reinforcement learning | Support adaptive response and prioritization |
-
----
-
-## 7.5 Step 5: Correlation and Risk Scoring
-
-A mature SOC should avoid treating every event as an independent alert.
-
-Instead, the SOC should ask:
-
-> Do multiple weak signals combine into a strong incident?
-
-Example:
+Raw events rarely contain enough meaning. The SOC enriches them:
 
 ```text
-New-country login
-+ failed MFA attempts
-+ successful MFA approval
-+ sensitive folder access
-+ large download
-= high-risk account compromise
+IP address -> known malicious, residential VPN, Tor exit, cloud provider, normal country?
+User -> role, normal working hours, usual device, privilege level?
+Device -> managed or unmanaged, criticality, patch level, EDR status?
+File or resource -> public, internal, confidential, regulated?
+Process -> signed binary, admin tool, suspicious command line?
+Cloud API call -> common for this user or rare and high-impact?
 ```
 
----
+## Step 3: Feature Extraction
 
-## 7.6 Step 6: Analyst Investigation
+AI models usually do not operate directly on raw log text. They need measurable features.
 
-AI may assign a risk score, but the analyst must validate the evidence.
+| **Feature Type** | **Example Feature**                    | **Why It Matters**                 |
+|:-----------------|:---------------------------------------|:-----------------------------------|
+| Frequency        | failed logins per minute               | Brute force or credential stuffing |
+| Rarity           | process rarity score for this host     | Unusual execution behaviour        |
+| Temporal         | activity outside user baseline         | Suspicious time pattern            |
+| Geo-spatial      | distance from usual login region       | Possible impossible travel         |
+| Sequence         | login then discovery then exfiltration | Multi-stage attack pattern         |
+| Graph-based      | unusual edge between user and resource | Abnormal relationship              |
+| Semantic         | suspicious command-line tokens         | Malicious use of legitimate tools  |
+| Contextual       | asset criticality and data sensitivity | Business impact                    |
 
-The analyst may ask:
+## Step 4: Detection Models
 
-- Is the user travelling?
-- Is the device managed or unmanaged?
-- Is the accessed folder sensitive?
-- Has this behavior happened before?
-- Is there malware activity on the endpoint?
-- Are there similar events involving other users?
-- What is the possible business impact?
+Different AI methods support different SOC tasks.
 
----
+| **Method**                     | **Typical SOC Use**                                  | **Main Risk**                           |
+|:-------------------------------|:-----------------------------------------------------|:----------------------------------------|
+| Supervised learning            | Classify known malicious and benign examples         | Poor generalization to new attacks      |
+| Unsupervised anomaly detection | Detect rare behaviour without many labels            | Many false positives                    |
+| Semi-supervised learning       | Learn normal behaviour, flag deviations              | Concept drift                           |
+| Graph analytics                | Detect suspicious entity relationships               | Data integration complexity             |
+| Sequence models                | Detect abnormal order of events                      | Requires good temporal data             |
+| LLMs                           | Summarize incidents, explain evidence, assist triage | Hallucination and over-trust            |
+| Reinforcement learning         | Support adaptive response policies                   | Unsafe exploration in real environments |
 
-## 7.7 Step 7: Response Decision
+## Step 5: Correlation and Risk Scoring
 
-Possible response actions include:
+A mature SOC should not treat each event as independent. It should ask:
 
-| Response | Example |
-|---|---|
-| Monitor | Continue observing the account or host |
-| Enrich | Collect more evidence |
-| Challenge | Require MFA again |
-| Contain | Disable account, isolate host, revoke session |
-| Eradicate | Remove malware or malicious persistence |
-| Recover | Restore affected systems |
-| Report | Escalate to incident response team |
+> Do multiple weak signals combine into a strong threat hypothesis?
 
-The response should be proportional to the confidence level and business impact.
+A simplified risk score can be expressed as:
 
----
+$$\text{Risk} = f(\text{likelihood}, \text{confidence}, \text{asset criticality}, \text{data sensitivity}, \text{attack stage})$$
 
-# 8. Mini Case Study: AI-Assisted Account Compromise Detection
+For teaching purposes, this can be simplified:
 
-## 8.1 Scenario
+$$\text{Risk Score} = 0.35A + 0.25B + 0.20C + 0.20D$$
 
-A university staff account is compromised.
+where:
 
-The attacker does not immediately deploy malware.  
-Instead, they log in successfully, explore cloud storage, and download files.
+- $A$ = anomaly strength;
 
-This is realistic because many modern attacks begin with identity compromise rather than obvious malware execution.
+- $B$ = confidence in evidence;
 
----
+- $C$ = asset or data criticality;
 
-## 8.2 Timeline of Events
+- $D$ = attack-stage severity.
 
-| Time | Event | AI Interpretation | Analyst Question |
-|---|---|---|---|
-| 01:58 | Five failed logins from foreign IP | Possible brute force or credential stuffing | Is this normal for the user? |
-| 02:01 | Successful login after MFA approval | Suspicious successful access | Was MFA fatigue involved? |
-| 02:04 | Access to HR folder | Sensitive resource access | Does this user normally access HR files? |
-| 02:09 | Download of 2.3 GB data | Possible data exfiltration | Is this normal volume? |
-| 02:12 | Same account active from campus network | Impossible travel or session conflict | Is the account compromised? |
+> **Level 6 Depth Point**
+>
+> The model score is not the decision. The decision also depends on business impact, legal context, operational risk, and confidence in the evidence.
 
----
+# Why Accuracy Alone Is Not Enough
 
-## 8.3 What the AI Does
+A common beginner mistake is to say: “The model is 95% accurate, so it is good.” In a SOC, this can be misleading because real attacks are rare.
 
-The AI does not rely on a single event.
+Assume a SOC processes **100,000 events** in one day. Suppose only **100** of them are truly malicious. A model has:
 
-It combines multiple weak signals:
+- 95% true positive rate;
+
+- 1% false positive rate.
+
+Then:
+
+| **Measure**     | **Result**                                          |
+|:----------------|:----------------------------------------------------|
+| True positives  | 95 malicious events detected                        |
+| False negatives | 5 malicious events missed                           |
+| False positives | approximately 999 benign events incorrectly alerted |
+| Precision       | $95 / (95 + 999) \approx 8.7\%$                     |
+
+> **In-Class Question**
+>
+> **Question to students:** Why can a model with a low false positive rate still overwhelm the SOC?
+>
+> **Expected answer:** Because benign events are far more common than malicious events. Even a small false positive rate can generate many false alerts.
+
+> **Teaching Point**
+>
+> For SOC evaluation, students should consider precision, recall, false positive cost, false negative cost, time-to-detect, time-to-triage, explainability, and response impact.
+
+# Higher-Level Mini-Case: Multi-Stage Ransomware and Cloud Exfiltration
+
+> **Case Focus**
+>
+> This case is intentionally different from the short opening hook. The opening hook teaches prioritization. This mini-case teaches multi-stage reasoning, telemetry fusion, adversary tactics, and response trade-offs.
+
+## Scenario
+
+A university department is targeted by an attacker. The attacker begins with phishing, obtains valid credentials, abuses cloud access, moves laterally through the network, stages sensitive research data, and then prepares for ransomware impact.
+
+This scenario is more advanced than a simple unusual-login case because it requires students to reason across identity, email, endpoint, network, and cloud evidence.
+
+## Timeline of Evidence
+
+| **Time** | **Observed Evidence**                                                        | **Telemetry Source**                  | **SOC Interpretation**                                    |
+|:---------|:-----------------------------------------------------------------------------|:--------------------------------------|:----------------------------------------------------------|
+| 09:12    | Staff member clicks a link in a delivery-themed email                        | Email security gateway and click logs | Possible phishing entry point                             |
+| 09:18    | Successful login from residential VPN infrastructure using valid credentials | Identity logs                         | Valid account misuse; not enough alone, but suspicious    |
+| 09:21    | Unknown OAuth application requests access to mailbox and cloud files         | Cloud audit logs                      | Possible token abuse or persistence through consent grant |
+| 09:42    | Endpoint runs PowerShell with encoded command after browser activity         | EDR telemetry                         | Suspicious execution pattern                              |
+| 10:05    | Device connects to multiple file shares it rarely accesses                   | Network and file server logs          | Discovery or lateral movement                             |
+| 10:26    | Large archive file is created and uploaded to an external storage service    | Endpoint, proxy, and cloud logs       | Data staging and possible exfiltration                    |
+| 10:40    | Attempts to disable backups and delete shadow copies                         | EDR and Windows event logs            | Ransomware preparation or impact phase                    |
+
+## Mapping to Adversary Behaviour
+
+Students should not only list events. They should map evidence to attacker objectives.
+
+| **Adversary Objective**    | **Evidence in the Case**                | **Relevant SOC Question**                                         |
+|:---------------------------|:----------------------------------------|:------------------------------------------------------------------|
+| Initial access             | Phishing link click and credential use  | Was the user phished, and were credentials captured?              |
+| Persistence or token abuse | Unknown OAuth consent grant             | Can the attacker continue access even after password reset?       |
+| Execution                  | Encoded PowerShell execution            | Is this legitimate administration or malicious command execution? |
+| Discovery and collection   | Rare file share access and data archive | What data was accessed and staged?                                |
+| Exfiltration               | Upload to external storage service      | Was sensitive data transferred outside the organization?          |
+| Impact                     | Backup deletion attempts                | Is ransomware deployment imminent?                                |
+
+> **Teaching Point**
+>
+> This case encourages students to think in terms of a threat hypothesis: “The attacker is moving from valid account access toward data theft and ransomware impact.”
+
+## What the AI System Does
+
+The AI-assisted SOC does not simply say “malicious” or “benign”. It supports investigation by combining evidence.
 
 ```text
-Unusual location
-+ unusual login time
-+ repeated MFA attempts
-+ sensitive file access
-+ large download
-+ impossible travel
-= high-risk incident
+Evidence cluster:
+- Phishing click by same user
+- Successful login from unusual infrastructure
+- Unknown OAuth consent grant
+- Encoded PowerShell on managed endpoint
+- Rare access to file shares
+- Archive creation and external upload
+- Backup deletion attempts
 ```
-
-The AI may generate an incident such as:
 
 ```text
-Incident Type: Possible account compromise
-Risk Level: High
-Confidence: Medium to High
-
-Main Evidence:
-- Login from unusual country
-- MFA failures followed by success
-- Access to sensitive HR data
-- Data download above normal user baseline
-- Concurrent session from campus network
+Threat hypothesis:
+Possible hands-on-keyboard intrusion progressing toward data exfiltration and ransomware impact.
 ```
 
----
+```text
+Risk level:
+Critical
+```
 
-## 8.4 What the Human Analyst Does
+```text
+Recommended immediate actions:
+1. Revoke cloud sessions and OAuth tokens.
+2. Isolate the endpoint from the network.
+3. Disable or reset the affected account after preserving evidence.
+4. Block the external upload destination temporarily.
+5. Check whether other users clicked the same phishing link.
+6. Preserve logs and start incident response procedures.
+```
 
-The analyst should not blindly trust the AI.
+## What the Human Analyst Must Validate
 
-The analyst should validate the incident:
+The analyst should validate:
 
-1. Check whether the user is travelling.
-2. Confirm whether the data download was expected.
-3. Review endpoint and cloud activity.
-4. Look for similar activity involving other users.
-5. Revoke suspicious sessions if necessary.
-6. Reset credentials if compromise is likely.
-7. Preserve logs for incident investigation.
-8. Feed the final decision back into the detection system.
+1.  Was the OAuth application approved by IT or by the user?
 
----
+2.  Is PowerShell execution normal for this role and device?
 
-## Teaching Point
+3.  Which files were accessed, archived, and uploaded?
 
-> AI can rank the incident, but the human analyst remains responsible for the final operational decision.
+4.  Was the external destination personal cloud storage, attacker infrastructure, or a legitimate service?
 
----
+5.  Are backup deletion attempts confirmed, or are they false positives?
 
-# 9. Interactive Activity: Escalate or Dismiss?
+6.  Are other users affected by the same phishing campaign?
+
+7.  What containment action is proportionate to the evidence and business impact?
+
+> **Level 6 Depth Point**
+>
+> This is the correct depth for Level 6: students should connect technical evidence, attacker behaviour, model output, and operational response.
+
+# Interactive Activity: Build a Threat Hypothesis
 
 ## Activity Goal
 
-Students practice SOC reasoning by deciding whether a set of weak signals should be escalated.
+Students practise SOC reasoning by constructing a threat hypothesis from incomplete evidence. They must avoid two weak answers:
 
----
+- **Overreaction:** “Disable everything immediately.”
 
-## Activity Scenario
-
-You are a SOC analyst.
-
-You receive the following events:
-
-| Event | Description |
-|---|---|
-| 1 | User logs in from a new country at 02:00 |
-| 2 | Same user fails MFA twice, then succeeds |
-| 3 | User downloads 2 GB from a sensitive folder |
-| 4 | Endpoint runs a normal browser process |
-| 5 | Same account is active from the campus network 10 minutes later |
-
----
+- **Underreaction:** “It is only one suspicious login.”
 
 ## Student Task
 
-Discuss in pairs or small groups:
+Working in pairs, students answer the following:
 
-1. Which events are weak signals?
-2. Which events are probably benign?
-3. Which combination becomes strong evidence?
-4. Should this incident be escalated?
-5. Should the SOC automatically disable the account?
+1.  Which evidence items are weak signals, and which are strong signals?
 
----
+2.  Which events map to initial access, execution, collection, exfiltration, and impact?
 
-## Expected Discussion
+3.  What is the most plausible threat hypothesis?
 
-Event 1 alone is suspicious but not enough.
+4.  Which immediate containment actions are justified?
 
-Event 2 may suggest MFA fatigue.
+5.  Which actions should require human approval?
 
-Event 3 increases risk because sensitive data is involved.
+6.  What additional evidence would reduce uncertainty?
 
-Event 4 is probably benign unless additional evidence appears.
+## Expected High-Quality Student Answer
 
-Event 5 suggests impossible travel or session hijacking.
+A strong answer should say something like:
 
-Together, events 1, 2, 3, and 5 should be escalated.
+> The case suggests a multi-stage intrusion rather than a single anomalous login. The phishing click and valid login are early signals. The OAuth consent grant increases concern because token access may survive password reset. Encoded PowerShell, rare file share access, archive creation, external upload, and backup deletion attempts together support a high-confidence hypothesis of data theft followed by ransomware preparation. Immediate containment is justified, but destructive actions should be controlled and evidence should be preserved.
 
----
+## Possible Risk-Scoring Exercise
 
-## Good Answer
+Ask students to score the case from 0 to 5 for each dimension:
 
-The SOC should probably escalate the incident.
+| **Dimension**          | **Score** | **Reason**                                                                 |
+|:-----------------------|:----------|:---------------------------------------------------------------------------|
+| Anomaly strength       | 5         | Multiple abnormal behaviours across identity, endpoint, network, and cloud |
+| Evidence confidence    | 4         | Several independent telemetry sources confirm the pattern                  |
+| Asset/data criticality | 4         | Research files and institutional data may be sensitive                     |
+| Attack-stage severity  | 5         | Evidence reaches exfiltration and possible impact phase                    |
 
-However, automatic account disabling may depend on:
+Using the simple formula:
 
-- The user’s role
-- The sensitivity of the accessed data
-- The confidence of detection
-- The potential business impact
-- Available safer actions
+$$\text{Risk Score} = 0.35A + 0.25B + 0.20C + 0.20D$$
 
-A safe first response may include:
+we get:
 
-```text
-Revoke active sessions
-Require re-authentication
-Trigger step-up MFA
-Contact the user
-Temporarily restrict access to sensitive files
-```
+$$0.35(5) + 0.25(4) + 0.20(4) + 0.20(5) = 4.55/5$$
 
----
+This supports urgent escalation.
 
-# 10. Why AI Fails in SOC Environments
+# Why AI Fails in SOC Environments
 
-AI is useful, but it is not perfect.
+AI is useful, but it fails in predictable ways. A cybersecurity graduate should be able to explain these failure modes.
 
-A good cybersecurity professional must understand both the strengths and weaknesses of AI-based detection.
+## Failure 1: Missing or Poor-Quality Data
 
----
-
-## 10.1 Failure 1: Bad Data
-
-AI depends on data quality.
-
-If logs are missing, delayed, duplicated, or inconsistent, the AI system may make poor decisions.
-
-Example:
+If endpoint logs are missing, the AI system may see a suspicious login but not the execution that follows.
 
 ```text
-The identity system shows a suspicious login.
-But endpoint logs are missing.
-The AI cannot see whether malware was executed after login.
+Identity logs: suspicious login observed
+Endpoint logs: missing
+Cloud logs: delayed
+Result: incomplete investigation picture
 ```
 
----
+## Failure 2: Lack of Context
 
-## 10.2 Failure 2: Lack of Context
-
-AI may classify legitimate activity as suspicious if it lacks context.
-
-Example:
+AI may treat legitimate maintenance as malicious if it does not know the user’s role or the maintenance window.
 
 ```text
-A system administrator runs PowerShell at midnight.
+PowerShell at midnight by domain administrator: possibly normal
+PowerShell at midnight by HR laptop: suspicious
 ```
 
-This may be suspicious for a normal employee but normal for an administrator during maintenance.
+## Failure 3: Concept Drift
 
----
-
-## 10.3 Failure 3: Concept Drift
-
-Normal behavior changes over time.
-
-Example:
+Normal behaviour changes over time.
 
 ```text
-During exam registration week, university systems may receive unusually high traffic.
-A model trained during a quiet semester may generate many false positives.
+During exam registration, university systems may receive unusual traffic.
+A model trained during a quiet period may generate many false positives.
 ```
 
----
+## Failure 4: Base-Rate Problem
 
-## 10.4 Failure 4: Adversarial Behavior
+Even a model with a low false positive rate can overwhelm analysts because real attacks are rare. This is why precision and operational workload matter.
 
-Attackers adapt to detection systems.
+## Failure 5: Adversarial Adaptation
 
-Example:
+Attackers can change behaviour to avoid detection.
 
 ```text
-Instead of downloading 5 GB at once,
-the attacker downloads small files slowly over several days.
+Instead of uploading 5 GB at once,
+the attacker uploads 50 MB every hour for several days.
 ```
 
-This is called low-and-slow behavior.
+This low-and-slow behaviour may evade simple threshold rules.
 
----
+## Failure 6: Explainability Gap
 
-## 10.5 Failure 5: Explainability Problem
-
-A black-box alert is hard to trust.
-
-Poor alert:
+A poor alert says:
 
 ```text
 Risk score: 94%
 ```
 
-Better alert:
+A better alert says:
 
 ```text
 Risk score: 94%
-
-Reasons:
-- New login country
-- Impossible travel
-- Sensitive folder access
-- Data transfer 8 times above user baseline
+Main reasons:
+- Unknown OAuth consent grant
+- Encoded PowerShell execution
+- Rare file-share access
+- Archive creation
+- External upload
+- Backup deletion attempt
 ```
 
-SOC analysts need explanations, not only scores.
+SOC analysts need reasons, not only scores.
 
----
+## Failure 7: Automation Risk
 
-## 10.6 Failure 6: Automation Risk
-
-Automated response can cause damage if used carelessly.
-
-Example:
+Automated containment can cause damage.
 
 ```text
-An AI system automatically disables a critical administrator account.
+The AI system disables a critical administrator account.
 The alert was a false positive.
-Now an important service outage cannot be fixed quickly.
+A production outage cannot be fixed quickly.
 ```
 
-Automation should be proportional to risk.
+> **Teaching Point**
+>
+> In cybersecurity, false negatives may allow attacks, but false positives can also disrupt the organization. Good SOC design must balance both.
 
----
-
-## 10.7 Key Principle
-
-> In cybersecurity, a false negative may allow an attack, but a false positive may disrupt the organization.
-
-Both errors matter.
-
----
-
-# 11. Human-in-the-Loop SOC
+# Human-in-the-Loop SOC
 
 AI should support human analysts, not replace them completely.
 
-The best design is often a **human-in-the-loop SOC**.
+## What AI Can Do Well
 
----
+AI can support:
 
-## 11.1 What AI Can Do Well
+- alert grouping and deduplication;
 
-AI can help with:
+- anomaly detection;
 
-- Alert grouping
-- Risk scoring
-- Event correlation
-- Anomaly detection
-- Evidence enrichment
-- Incident summarization
-- Repetitive triage tasks
-- Pattern discovery in large datasets
+- entity correlation;
 
----
+- behavioural baselining;
 
-## 11.2 What Humans Still Do Better
+- threat intelligence enrichment;
+
+- incident summarization;
+
+- evidence ranking;
+
+- recommended next investigative steps.
+
+## What Humans Still Do Better
 
 Human analysts are needed for:
 
-- Understanding business impact
-- Judging incomplete evidence
-- Communicating with users and managers
-- Handling novel attack scenarios
-- Making high-impact containment decisions
-- Understanding legal and ethical implications
-- Deciding proportional response actions
+- understanding business impact;
 
----
+- judging incomplete and conflicting evidence;
 
-## 11.3 What Should Be Automated?
+- communicating with users, managers, and legal teams;
 
-Low-risk and repetitive actions are good candidates for automation.
+- making high-impact containment decisions;
 
-Examples:
+- understanding ethical and regulatory consequences;
+
+- deciding whether response is proportionate.
+
+## What Can Be Automated?
+
+Low-risk and reversible actions are good candidates for automation:
 
 ```text
 Collect related logs
 Query threat intelligence
 Group similar alerts
 Enrich IP addresses and domains
-Generate incident summaries
-Create investigation tickets
+Generate an incident summary
+Create an investigation ticket
+Trigger step-up authentication
 ```
 
----
+## What Should Require Human Approval?
 
-## 11.4 What Should Require Human Approval?
-
-High-impact actions should usually require human approval.
-
-Examples:
+High-impact or irreversible actions should usually require approval:
 
 ```text
 Disable administrator account
 Isolate production server
-Block business-critical network traffic
-Delete files
+Block business-critical traffic
 Terminate cloud workloads
+Delete files
 Report breach externally
 ```
 
----
+# In-Lecture Q&A Prompts
 
-# 12. In-Lecture Q&A Prompts
+## Q1. Why is the most obvious alert not always the most dangerous alert?
 
-Use the following questions during the lecture to create engagement.
+**Expected answer:** Because a noisy alert may be blocked or contained, while a less obvious successful compromise may create greater risk.
 
----
+## Q2. What is the difference between an alert and an incident?
 
-## Q1. Why is the most obvious alert not always the most dangerous one?
+**Expected answer:** An alert is usually a warning signal from one source. An incident is a correlated set of evidence that suggests a meaningful security problem requiring response.
 
-**Expected Answer:**  
-Because a noisy alert may be easy to detect but already contained, while a subtle successful compromise may cause more damage.
+## Q3. Why is an OAuth consent grant dangerous in the mini-case?
 
----
+**Expected answer:** Because it may give an attacker persistent cloud access through tokens or application permissions, even if the user password is later changed.
 
-## Q2. Can AI detect an attacker’s intention?
+## Q4. Why can a 95% accurate model still be operationally poor?
 
-**Expected Answer:**  
-No. AI detects observable traces such as login behavior, network flows, file access, process activity, and deviations from normal baselines.
+**Expected answer:** Because attacks are rare. A small false positive rate can still produce many false alerts and overwhelm analysts.
 
----
+## Q5. Why should a SOC map evidence to attacker tactics?
 
-## Q3. What is the difference between an alert and an incident?
-
-**Expected Answer:**  
-An alert is usually a single warning signal.  
-An incident is a correlated set of events that together suggest a meaningful security problem.
-
----
-
-## Q4. Which is more important in the case study: failed logins or successful login?
-
-**Expected Answer:**  
-The successful login is more important because the attacker may already have access. Failed attempts are important as supporting evidence.
-
----
-
-## Q5. Why can a highly accurate model still be dangerous in a SOC?
-
-**Expected Answer:**  
-Because accuracy alone does not capture operational cost, false positives, missed high-impact attacks, explainability, business context, or response consequences.
-
----
+**Expected answer:** It helps analysts understand attacker objectives, identify missing evidence, prioritize response, and communicate findings using a common language.
 
 ## Q6. What should be automated, and what should remain human-controlled?
 
-**Expected Answer:**  
-Low-risk enrichment and evidence collection can be automated.  
-High-impact actions such as disabling critical accounts or isolating production servers should usually require human approval.
+**Expected answer:** Evidence collection, enrichment, alert grouping, and ticket creation can often be automated. High-impact containment actions should usually require human approval.
 
----
+# Final Takeaway
 
-# 13. Final Takeaway
-
-AI in the SOC is not about replacing analysts.
-
-It is about helping analysts:
-
-- Connect weak signals
-- Reduce alert noise
-- Prioritize risk
-- Investigate faster
-- Make better threat decisions
-- Respond in a more explainable and accountable way
-
----
-
-## Final Summary
+AI in the SOC is not about replacing analysts. It is about improving the quality and speed of security decisions.
 
 ```text
-AI in SOC:
-
-1. Sees telemetry, not attackers.
-2. Connects weak signals into incidents.
-3. Prioritizes risk under uncertainty.
-4. Fails without context, quality data, and human judgment.
-5. Should support accountable security decisions, not blindly automate them.
+AI in the SOC:
+1. Sees telemetry, not intentions.
+2. Converts raw events into features and relationships.
+3. Correlates weak signals into threat hypotheses.
+4. Prioritizes incidents under uncertainty.
+5. Requires context, explainability, and human judgment.
+6. Should support proportionate and accountable response.
 ```
 
----
+> The best SOC is not the one with the most alerts. The best SOC is the one that turns telemetry into timely, explainable, and proportionate action.
 
-## Closing Statement
+# Suggested Reading
 
-The best SOC is not the one with the most alerts.
+1.  NIST, *SP 800-61 Rev. 3: Incident Response Recommendations and Considerations for Cybersecurity Risk Management*.  
+```text
+<https://csrc.nist.gov/pubs/sp/800/61/r3/final>
+```
 
-The best SOC is the one that turns telemetry into timely, explainable, and proportionate action.
+2.  NIST, *Artificial Intelligence Risk Management Framework*.  
+```text
+<https://www.nist.gov/itl/ai-risk-management-framework>
+```
 
----
+3.  MITRE, *ATT&CK Enterprise Matrix*.  
+```text
+<https://attack.mitre.org/matrices/enterprise/>
+```
 
-# 14. Suggested Reading
+4.  CISA, *Cybersecurity Incident and Vulnerability Response Playbooks*.  
+```text
+<https://www.cisa.gov/resources-tools/resources/federal-government-cybersecurity-incident-and-vulnerability-response-playbooks>
+```
 
-1. NIST, **Computer Security Incident Handling Guide**, SP 800-61.  
-   <https://csrc.nist.gov/publications/detail/sp/800-61/rev-2/final>
+5.  Microsoft, *Microsoft Sentinel Documentation*.  
+```text
+<https://learn.microsoft.com/en-us/azure/sentinel/>
+```
 
-2. NIST, **Artificial Intelligence Risk Management Framework**.  
-   <https://www.nist.gov/itl/ai-risk-management-framework>
+# Optional Instructor Notes for a 10–15 Minute Teaching Assessment
 
-3. Microsoft, **Microsoft Sentinel Documentation**.  
-   <https://learn.microsoft.com/en-us/azure/sentinel/>
+A possible timing is:
 
-4. IBM, **What is SIEM?**  
-   <https://www.ibm.com/topics/siem>
+| **Section**                                              | **Time**  |
+|:---------------------------------------------------------|:----------|
+| Opening triage puzzle: two-slide hook                    | 2 minutes |
+| Why AI is used in SOC and what AI sees                   | 2 minutes |
+| Pipeline: telemetry to features to risk scoring          | 3 minutes |
+| Mini-case: multi-stage ransomware and cloud exfiltration | 4 minutes |
+| Interactive threat-hypothesis question                   | 2 minutes |
+| Why AI fails and final takeaway                          | 2 minutes |
 
-5. MITRE, **ATT&CK Framework**.  
-   <https://attack.mitre.org/>
+For a teaching assessment, do not try to present every table in detail. Use the tables as structured teaching material, but select the most important points verbally. The strongest delivery strategy is:
 
-6. CISA, **Cybersecurity Incident and Vulnerability Response Playbooks**.  
-   <https://www.cisa.gov/resources-tools/resources/federal-government-cybersecurity-incident-and-vulnerability-response-playbooks>
+1.  Start with the short triage puzzle.
 
----
+2.  Move quickly to the idea that SOC work is evidence construction.
 
-# 15. Optional Instructor Notes
+3.  Use the ransomware mini-case as the main example.
 
-This lecture is suitable for a 10–15 minute teaching assessment.
+4.  Ask students to justify a threat hypothesis.
 
-A recommended timing is:
-
-| Section | Time |
-|---|---|
-| Opening hook | 2 minutes |
-| Why AI is used | 2 minutes |
-| What AI sees | 2 minutes |
-| Detection pipeline | 3 minutes |
-| Mini case study | 3 minutes |
-| Why AI fails | 2 minutes |
-| Final takeaway | 1 minute |
-
-For a longer class session, expand the interactive activity and ask students to design their own AI-assisted detection rule or risk score.
+5.  End with the human-in-the-loop principle.
