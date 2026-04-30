@@ -785,29 +785,14 @@ AI in the SOC:
 
 # Suggested Reading
 
-1.  NIST, *SP 800-61 Rev. 3: Incident Response Recommendations and Considerations for Cybersecurity Risk Management*.  
-```text
-<https://csrc.nist.gov/pubs/sp/800/61/r3/final>
-```
+1. NIST. [*SP 800-61 Rev. 3: Incident Response Recommendations and Considerations for Cybersecurity Risk Management*](https://csrc.nist.gov/pubs/sp/800/61/r3/final).
 
-2.  NIST, *Artificial Intelligence Risk Management Framework*.  
-```text
-<https://www.nist.gov/itl/ai-risk-management-framework>
-```
+2. NIST. [*Artificial Intelligence Risk Management Framework*](https://www.nist.gov/itl/ai-risk-management-framework).
 
-3.  MITRE, *ATT&CK Enterprise Matrix*.  
-```text
-<https://attack.mitre.org/matrices/enterprise/>
-```
+3. MITRE. [*ATT&CK Enterprise Matrix*](https://attack.mitre.org/matrices/enterprise/).
 
-4.  CISA, *Cybersecurity Incident and Vulnerability Response Playbooks*.  
-```text
-<https://www.cisa.gov/resources-tools/resources/federal-government-cybersecurity-incident-and-vulnerability-response-playbooks>
-```
+4. CISA. [*Cybersecurity Incident and Vulnerability Response Playbooks*](https://www.cisa.gov/resources-tools/resources/federal-government-cybersecurity-incident-and-vulnerability-response-playbooks).
 
-5.  Microsoft, *Microsoft Sentinel Documentation*.  
-```text
-<https://learn.microsoft.com/en-us/azure/sentinel/>
-```
+5. Microsoft. [*Microsoft Sentinel Documentation*](https://learn.microsoft.com/en-us/azure/sentinel/).
 
 
