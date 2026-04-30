@@ -215,6 +215,8 @@ The aim is not to teach that every SOC uses exactly the same pipeline. The aim i
    -> restore normal operation, close detection gaps, update playbooks, and improve models
 ```
 
+![A Practical SOC Analytics and Response Workflow](../assets/images/soc-analytics-and-response-workflow.png)
+
 > **Key idea**
 >
 > AI is mainly used in the middle of this workflow: detection, correlation, prioritization, summarization, and recommendation. Incident ownership, proportionality, legal responsibility, and business-risk decisions remain human and organizational responsibilities.
