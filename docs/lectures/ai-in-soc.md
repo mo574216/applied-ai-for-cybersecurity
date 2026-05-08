@@ -1,7 +1,6 @@
 ---
 title: "Week 6 - AI in the Security Operations Center"
 layout: default
-nav_order: 6
 permalink: /lectures/ai-in-soc/
 ---
 # Week 6 - AI in the Security Operations Center
