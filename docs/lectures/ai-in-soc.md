@@ -1,11 +1,10 @@
 ---
-title: "AI in the Security Operations Center"
+title: "Week 6 - AI in the Security Operations Center"
 layout: default
 nav_order: 6
 permalink: /lectures/ai-in-soc/
 ---
-
-# AI in the Security Operations Center
+# Week 6 - AI in the Security Operations Center
 
 ## From Noisy Alerts to Threat Decisions
 
