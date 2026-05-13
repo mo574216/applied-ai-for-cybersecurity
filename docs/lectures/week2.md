@@ -1,7 +1,6 @@
 ---
 title: "Week 2: AI for Network Intrusion and DDoS Detection"
 layout: default
-nav_order: 2
 permalink: /lectures/week2/
 ---
 
