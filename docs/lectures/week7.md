@@ -4,6 +4,7 @@ layout: default
 permalink: /lectures/week7/
 ---
 
+
 # Week 7: AI for Security Operations and Threat Intelligence  
 ## From Alerts to Prioritised Security Decisions
 
