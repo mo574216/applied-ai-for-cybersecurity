@@ -1,7 +1,7 @@
 ---
 title: "Week 3: AI for Malware, Phishing, and Malicious URL Detection"
 layout: default
-permalink: /lectures/week3/
+permalink: /lectures/week4-1/
 ---
 
 # Week 3: AI for Malware, Phishing, and Malicious URL Detection  
