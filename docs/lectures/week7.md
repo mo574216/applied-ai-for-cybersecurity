@@ -1,7 +1,7 @@
 ---
 title: "Week 7: AI for Security Operations and Threat Intelligence"
 layout: default
-permalink: /lectures/week5/
+permalink: /lectures/week7/
 ---
 
 # Week 7: AI for Security Operations and Threat Intelligence  
