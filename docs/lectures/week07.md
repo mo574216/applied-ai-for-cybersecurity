@@ -1,11 +1,11 @@
 ---
-title: "Week 7: AI for Security Operations and Threat Intelligence"
+title: "Week 07: AI for Security Operations and Threat Intelligence"
 layout: default
-permalink: /lectures/week7/
+permalink: /lectures/week07/
 ---
 
 
-# Week 7: AI for Security Operations and Threat Intelligence  
+# Week 07: AI for Security Operations and Threat Intelligence  
 ## From Alerts to Prioritised Security Decisions
 
 Welcome to Week 7 of **Applied AI for Cybersecurity**.
