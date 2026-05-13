@@ -1,13 +1,13 @@
 ---
-title: "Week 4: AI for Security Operations and Threat Intelligence"
+title: "Week 5: AI for Security Operations and Threat Intelligence"
 layout: default
-permalink: /lectures/week4/
+permalink: /lectures/week5/
 ---
 
-# Week 4: AI for Security Operations and Threat Intelligence  
+# Week 5: AI for Security Operations and Threat Intelligence  
 ## From Alerts to Prioritised Security Decisions
 
-Welcome to Week 4 of **Applied AI for Cybersecurity**.
+Welcome to Week 5 of **Applied AI for Cybersecurity**.
 
 In Week 1, we introduced the foundations of applying AI to cybersecurity. In Week 2, we studied AI for network intrusion and DDoS detection. In Week 3, we focused on malware, phishing, and malicious URL detection.
 
