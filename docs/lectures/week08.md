@@ -1,10 +1,10 @@
 ---
-title: "Week 8: Large Language Models for Cybersecurity"
+title: "Week 08: Large Language Models for Cybersecurity"
 layout: default
-permalink: /lectures/week8/
+permalink: /lectures/week08/
 ---
 
-# Week 8: Large Language Models for Cybersecurity
+# Week 08: Large Language Models for Cybersecurity
 ## From Security Text to Assisted Cyber Defence
 
 Welcome to Week 8 of **Applied AI for Cybersecurity**.
