@@ -1,10 +1,10 @@
 ---
-title: "Week 9: AI for Vulnerability Management and Secure Software Engineering"
+title: "Week 09: AI for Vulnerability Management and Secure Software Engineering"
 layout: default
-permalink: /lectures/week9/
+permalink: /lectures/week09/
 ---
 
-# Week 9: AI for Vulnerability Management and Secure Software Engineering
+# Week 09: AI for Vulnerability Management and Secure Software Engineering
 ## From Vulnerability Lists to Risk-Based Remediation
 
 Welcome to Week 9 of **Applied AI for Cybersecurity**.
