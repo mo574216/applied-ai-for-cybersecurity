@@ -1,10 +1,10 @@
 ---
-title: "Week 3: AI for Network Intrusion and DDoS Detection"
+title: "Week 03: AI for Network Intrusion and DDoS Detection"
 layout: default
-permalink: /lectures/week3/
+permalink: /lectures/week03/
 ---
 
-# Week 3: AI for Network Intrusion and DDoS Detection  
+# Week 03: AI for Network Intrusion and DDoS Detection  
 ## From Network Traffic to Attack Detection
 
 
