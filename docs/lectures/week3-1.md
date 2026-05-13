@@ -1,7 +1,7 @@
 ---
 title: "Week 3: AI for Network Intrusion and DDoS Detection"
 layout: default
-permalink: /lectures/week2-2/
+permalink: /lectures/week3-1/
 ---
 
 # Week 3: AI for Network Intrusion and DDoS Detection  
