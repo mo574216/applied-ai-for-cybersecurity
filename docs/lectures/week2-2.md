@@ -1,13 +1,13 @@
 ---
-title: "Week 2: AI for Network Intrusion and DDoS Detection"
+title: "Week 3: AI for Network Intrusion and DDoS Detection"
 layout: default
 permalink: /lectures/week2/
 ---
 
-# Week 2: AI for Network Intrusion and DDoS Detection  
+# Week 3: AI for Network Intrusion and DDoS Detection  
 ## From Network Traffic to Attack Detection
 
-Welcome to Week 2 of **Applied AI for Cybersecurity**.
+Welcome to Week 3 of **Applied AI for Cybersecurity**.
 
 In Week 1, we studied how cybersecurity problems can be converted into AI problems. We discussed security data, features, labels, models, predictions, decisions, and evaluation metrics.
 
