@@ -1,7 +1,6 @@
 ---
 title: "Week 1: Introduction to Applied AI for Cybersecurity"
 layout: default
-nav_order: 1
 permalink: /lectures/week1/
 ---
 
