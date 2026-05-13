@@ -1,10 +1,10 @@
 ---
-title: "Week 5: Deep Learning for Cybersecurity"
+title: "Week 05: Deep Learning for Cybersecurity"
 layout: default
 permalink: /lectures/week5/
 ---
 
-# Week 5: Deep Learning for Cybersecurity  
+# Week 05: Deep Learning for Cybersecurity  
 ## From Handcrafted Features to Learned Representations
 
 Welcome to Week 5 of **Applied AI for Cybersecurity**.
