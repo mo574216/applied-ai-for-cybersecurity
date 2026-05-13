@@ -1,13 +1,13 @@
 ---
 title: "Week 5: Trustworthy, Adversarial, and Responsible AI in Cybersecurity"
 layout: default
-permalink: /lectures/week5/
+permalink: /lectures/week6/
 ---
 
-# Week 5: Trustworthy, Adversarial, and Responsible AI in Cybersecurity  
+# Week 6: Trustworthy, Adversarial, and Responsible AI in Cybersecurity  
 ## Securing AI Systems and Using AI Responsibly in Cyber Defence
 
-Welcome to Week 5 of **Applied AI for Cybersecurity**.
+Welcome to Week 6 of **Applied AI for Cybersecurity**.
 
 In previous weeks, we studied how AI can support cybersecurity tasks such as intrusion detection, DDoS detection, phishing detection, malware detection, alert triage, and threat intelligence. This week asks a more critical question:
 
