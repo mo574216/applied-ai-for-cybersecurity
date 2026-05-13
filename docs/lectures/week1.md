@@ -1,1056 +1,1114 @@
 ---
-title: "Week 1 — Foundations of Applied AI for Cybersecurity"
+title: "Week 1: Introduction to Applied AI for Cybersecurity"
 layout: default
+nav_order: 1
 permalink: /lectures/week1/
 ---
 
-# Week 1 — Foundations of Applied AI for Cybersecurity
+# Week 1: Introduction to Applied AI for Cybersecurity  
+## From Security Data to AI-Driven Decisions
 
-## Overview
+Welcome to Week 1 of **Applied AI for Cybersecurity**.
 
-This first week sets the intellectual foundation for the whole module. It addresses a central question:
+This week introduces the main idea of the course: artificial intelligence can support cybersecurity, but it must be used carefully. AI is not a magic detector of attacks. It is a set of methods that can help us analyse security data, detect suspicious patterns, prioritise risks, and support security decisions.
 
-> **Why has AI become so important in cybersecurity, and why must security professionals use it carefully rather than uncritically?**
+The key question for this week is:
 
-Students are often exposed to exaggerated claims about AI in cyber defence. Some believe AI can replace analysts. Others assume AI is just another buzzword with little practical value. The purpose of this session is to move beyond both extremes.
-
-This week shows that AI matters in cybersecurity because modern digital systems generate large amounts of heterogeneous, noisy, and time-sensitive data, while defenders must make decisions under uncertainty and adversarial pressure. AI can help with detection, triage, prioritisation, clustering, summarisation, and pattern extraction. At the same time, AI systems can be brittle, misleading, overtrusted, badly evaluated, or poorly aligned with operational needs.
-
-This is therefore not a lecture about “AI magic.” It is a lecture about **where AI fits, where it fails, and how cybersecurity problems should be framed before any model is chosen**.
+> How do we convert a cybersecurity problem into an AI problem without losing the security meaning?
 
 ---
 
-## Teaching Position of This Lecture in the Module
+# 1. Why This Week Matters
 
-This session is the conceptual entry point for the full course.
+Cybersecurity is now a data-intensive field. Modern systems generate large volumes of data from networks, endpoints, cloud platforms, authentication systems, email systems, web applications, and security tools.
 
-It prepares students for later weeks by establishing:
+Security professionals need to answer questions such as:
 
-- the vocabulary of AI in cybersecurity;
-- the difference between AI, machine learning, deep learning, and generative AI;
-- the kinds of cyber data used in AI-enabled workflows;
-- the importance of problem framing;
-- the reasons many AI-for-cyber projects fail despite promising demos;
-- the idea that AI systems must be evaluated operationally, not just computationally.
+- Is this network traffic normal or malicious?
+- Is this email phishing or legitimate?
+- Is this file malware or benign software?
+- Is this login suspicious or expected?
+- Is this traffic spike a DDoS attack or a legitimate flash crowd?
+- Is this alert important enough for an analyst to investigate?
+- Should the system automatically block, quarantine, or escalate?
 
-This week is intentionally broad, because later weeks will go deeper into:
-
-- datasets and classical machine learning;
-- deep learning and generative AI;
-- attacks against AI systems;
-- trustworthy deployment, governance, and judgement.
+AI can help with these questions, but only when the problem is defined correctly, the data is meaningful, the model is evaluated properly, and the final decision is interpreted in context.
 
 ---
 
-## Learning Outcomes
+# 2. Learning Objectives
 
-By the end of this week, students should be able to:
+By the end of this week, you should be able to:
 
-1. explain the difference between AI, machine learning, deep learning, and generative AI in a cybersecurity context;
-2. identify common cybersecurity tasks that can be framed as data-driven problems;
-3. describe major categories of cybersecurity data used in AI-enabled workflows;
-4. explain why problem framing, data quality, and evaluation often matter more than model novelty;
-5. discuss major strengths and limitations of AI-based cybersecurity systems;
-6. distinguish between technical performance and operational usefulness;
-7. participate in classroom discussion about where AI should and should not be trusted in security practice.
-
----
-
-## Indicative Session Plan for Classroom Delivery
-
-This file is designed for a live classroom session of approximately **2 hours**, but it can also be adapted.
-
-### Suggested lecture rhythm
-
-- **Part 1:** Motivation and framing — 20 minutes
-- **Part 2:** AI vocabulary and distinctions — 20 minutes
-- **Part 3:** Cybersecurity data and workflows — 20 minutes
-- **Part 4:** Framing cyber problems as AI tasks — 20 minutes
-- **Part 5:** Why AI-for-cyber projects fail — 20 minutes
-- **Part 6:** Strengths, limits, and discussion — 15 minutes
-- **Part 7:** Wrap-up and transition to lab — 5 minutes
-
-### Suggested interactive rhythm
-
-Include:
-- 2 quick show-of-hands polls;
-- 2 think-pair-share activities;
-- 1 mini case discussion;
-- 1 short end-of-class reflection.
+1. Explain the role of AI in modern cybersecurity.
+2. Identify major cybersecurity use cases for AI.
+3. Distinguish between security data, features, labels, models, predictions, and decisions.
+4. Explain the difference between classification, anomaly detection, and risk scoring.
+5. Define false positives, false negatives, precision, recall, and F1-score in cybersecurity terms.
+6. Explain why accuracy alone is not enough for security evaluation.
+7. Discuss why AI for cybersecurity is difficult because of adversarial behaviour, class imbalance, noisy data, poor labels, and concept drift.
+8. Apply basic reasoning to classify a security observation as benign, suspicious, malicious, or uncertain.
 
 ---
 
-# Part 1 — Why AI Matters in Cybersecurity
+# 3. What Does “Applied AI for Cybersecurity” Mean?
 
-## 1.1 Opening hook for the classroom
+Applied AI for cybersecurity means using AI and machine learning techniques to support cyber defence tasks.
 
-Start the session with a question such as:
-
-> If an organisation gives its SOC an AI assistant tomorrow, what exactly should improve first?
-
-Write student answers on the board. Likely answers:
-- faster detection;
-- fewer alerts;
-- better prioritisation;
-- less analyst workload;
-- faster reporting;
-- improved accuracy.
-
-Then ask the follow-up:
-
-> Which of these improvements are actually guaranteed by “adding AI”?
-
-This usually surfaces an important teaching point immediately:
-**AI is not a direct synonym for improvement.**
-
----
-
-## 1.2 Why cybersecurity is an attractive domain for AI
-
-Cybersecurity is a natural area for AI because it combines five difficult properties:
-
-- **data-rich:** large volumes of logs, events, packets, telemetry, and text;
-- **time-sensitive:** defenders often need to act quickly;
-- **noisy:** security data contains irrelevant, duplicated, incomplete, and misleading signals;
-- **adversarial:** attackers adapt in response to defensive behaviour;
-- **operationally constrained:** analysts have limited time, imperfect visibility, and incomplete context.
-
-A modern organisation may generate:
-
-- firewall logs;
-- endpoint telemetry;
-- DNS and proxy logs;
-- authentication records;
-- cloud audit trails;
-- vulnerability scan outputs;
-- IDS/IPS alerts;
-- email metadata;
-- incident tickets;
-- analyst notes;
-- packet captures;
-- flow summaries.
-
-The human challenge is obvious: **no team can inspect all raw signals manually at scale**.
-
-This makes AI attractive for tasks such as:
-
-- classification of suspicious activity;
-- anomaly detection in traffic or behaviour;
-- ranking and prioritisation of alerts;
-- clustering related incidents;
-- phishing and malicious URL detection;
-- malware family analysis;
-- summarisation of reports and alerts;
-- support for rule writing and analyst workflows.
-
----
-
-## 1.3 Important caution
-
-At this point, make the distinction explicit:
-
-> **Attractive does not mean appropriate.**
-
-Some cyber problems are genuinely suited to AI.
-Others are better solved with:
-
-- deterministic rules;
-- careful engineering;
-- better visibility;
-- better logging;
-- stronger processes;
-- simpler statistical methods.
-
-A recurring theme in this module is:
-
-> **Do not ask, “Can we apply AI here?” before asking, “What problem are we actually trying to solve?”**
-
----
-
-## In-class Q&A prompt 1
-
-Ask students:
-
-1. Why does having more security data not automatically mean better security?
-2. If a SOC is overloaded with alerts, is AI always the first thing that should be added?
-3. What are examples of cyber problems where a simple rule might outperform a learned model?
-
----
-
-## Quick classroom activity 1 — Two-minute poll
-
-Ask students to vote on the following:
-
-> Which of the following is the most realistic short-term use of AI in a SOC?
-
-Options:
-- replacing analysts entirely;
-- automatically responding to every alert;
-- helping prioritise and summarise alerts;
-- eliminating the need for logs.
-
-Expected direction: students should see that **triage and support** are more realistic than full automation.
-
----
-
-# Part 2 — AI, Machine Learning, Deep Learning, and Generative AI
-
-## 2.1 Why this distinction matters
-
-Students often use these terms interchangeably. In classroom teaching, this causes confusion later, especially when moving from classical models to LLMs.
-
-Clarify the hierarchy early.
-
----
-
-## 2.2 Artificial Intelligence
-
-Artificial intelligence is the broad umbrella term.
-
-In this module, AI refers to computational techniques that support tasks associated with intelligent behaviour, such as:
-
-- prediction;
-- ranking;
-- recognition;
-- classification;
-- summarisation;
-- recommendation;
-- limited reasoning or assistance.
-
-Important note for students:
-AI does **not** necessarily imply consciousness, general intelligence, or human-like understanding.
-
-In cybersecurity, AI is often simply a practical label for systems that assist detection and decision-making.
-
----
-
-## 2.3 Machine Learning
-
-Machine learning is a subset of AI in which systems learn patterns from data instead of depending only on hand-written logic.
-
-Examples in cybersecurity:
-
-- classifying emails as phishing or benign;
-- predicting whether a flow is malicious;
-- identifying likely false positives;
-- grouping related incidents;
-- learning risk scores from past examples.
-
-Key teaching point:
-
-> Machine learning is powerful when patterns exist in data and when we can define a useful output target or behavioural notion of normality.
-
----
-
-## 2.4 Deep Learning
-
-Deep learning is a subset of machine learning based on multi-layer neural networks.
-
-It becomes useful when data is:
-
-- high-dimensional;
-- sequential;
-- unstructured or semi-structured;
-- difficult to describe with simple hand-engineered features.
-
-Examples in cybersecurity:
-
-- sequence modelling for logs;
-- traffic classification from flow sequences;
-- learned representations of malware behaviour;
-- text models for phishing or threat intelligence.
-
-Key classroom warning:
-Deep learning is **not automatically better**. It usually requires more data, more computation, and more careful evaluation.
-
----
-
-## 2.5 Generative AI
-
-Generative AI refers to models that create or transform content such as:
-
-- text;
-- code;
-- images;
-- structured summaries;
-- responses to prompts.
-
-In cybersecurity, the most visible examples are large language models.
-
-Possible uses include:
-
-- summarising alerts;
-- explaining logs or incidents;
-- drafting detection rules;
-- assisting analysts with investigations;
-- helping developers reason about secure coding issues.
-
-But generative AI introduces major risks:
-
-- hallucination;
-- overconfidence;
-- leakage of sensitive data;
-- unsafe integration into operational pipelines;
-- prompt-based manipulation.
-
----
-
-## Mini-contrast table
-
-| Term | Main idea | Cyber examples | Typical risk |
-|---|---|---|---|
-| AI | Broad umbrella | triage support, alert ranking | vague overclaiming |
-| ML | learns patterns from data | phishing classification, anomaly scoring | data quality dependence |
-| Deep Learning | neural learning from complex data | log sequences, malware representations | opacity and resource cost |
-| Generative AI | generates content | alert summaries, query drafting, analyst support | hallucination and unsafe outputs |
-
----
-
-## In-class Q&A prompt 2
-
-1. Is every AI system in cybersecurity a machine-learning system?
-2. Is every deep-learning system generative?
-3. Why might an organisation use classical ML instead of deep learning?
-4. Why does an LLM sounding fluent not guarantee that it is correct?
-
----
-
-## Misconceptions to address explicitly
-
-### Misconception 1
-**“AI means the system understands the attack.”**  
-Correction: many AI systems detect statistical patterns, not causal intent.
-
-### Misconception 2
-**“Deep learning is always more advanced and therefore better.”**  
-Correction: sometimes a simpler and more interpretable model is preferable.
-
-### Misconception 3
-**“Generative AI can replace analysts because it explains things well.”**  
-Correction: explanation quality and factual correctness are not the same.
-
----
-
-# Part 3 — Where AI Fits in the Security Workflow
-
-## 3.1 Cybersecurity as a workflow, not a single tool
-
-It is a mistake to think of cyber defence as “the model.” Security is an end-to-end process.
-
-A simplified defensive workflow includes:
-
-1. **data collection**  
-   gathering logs, telemetry, packets, endpoint signals, and threat intelligence;
-
-2. **normalisation and preprocessing**  
-   cleaning, deduplicating, structuring, and aligning data;
-
-3. **analysis and detection**  
-   rules, correlation, machine learning, anomaly detection, or hybrid methods;
-
-4. **prioritisation and triage**  
-   deciding what deserves analyst attention first;
-
-5. **investigation and interpretation**  
-   understanding what happened and why;
-
-6. **response and recovery**  
-   containment, eradication, communication, and post-incident learning.
-
-AI usually supports only part of this process.
-
----
-
-## 3.2 Where AI is most useful
-
-AI is often most useful in:
-
-- detection support;
-- ranking and triage;
-- clustering similar events;
-- text-heavy analyst assistance;
-- identifying patterns that humans would miss at scale.
-
-It is usually less trustworthy when used blindly for:
-
-- automatic irreversible response;
-- high-stakes decisions without human oversight;
-- contexts with poor labels or rapidly changing attacker behaviour.
-
----
-
-## 3.3 Why notebook success does not equal operational success
-
-A model that looks impressive in a notebook may fail in practice if:
-
-- the data is delayed or incomplete;
-- labels are noisy or inconsistent;
-- the environment changes after deployment;
-- analysts cannot interpret the output;
-- false positives overwhelm the team;
-- the model is solving the wrong problem.
-
-Key classroom phrase:
-
-> **A high-performing model in isolation may still be a low-value system in operation.**
-
----
-
-## Short think-pair-share activity
-
-Ask students to work in pairs for 3 minutes:
-
-> Imagine a phishing detection model with 98% accuracy. Why might a real SOC still dislike it?
-
-Expected answers:
-- poor precision;
-- too many false positives;
-- no explanation;
-- weak adaptation to new campaigns;
-- not aligned with workflow;
-- difficult integration into email systems.
-
-Then debrief with the full class.
-
----
-
-# Part 4 — Types of Cybersecurity Data
-
-## 4.1 Why “cyber data” is not one thing
-
-Cybersecurity draws on many data sources with different structures, timing properties, quality levels, and meanings.
-
-Students must understand that model design depends strongly on data type.
-
----
-
-## 4.2 Network traffic and flow data
-
-Examples:
-- packet captures;
-- NetFlow/IPFIX-style summaries;
-- session metadata;
-- protocol features.
-
-Use cases:
-- intrusion detection;
-- DDoS detection;
-- scanning detection;
-- protocol misuse detection;
-- anomaly detection;
-- encrypted traffic inference from metadata.
-
-Teaching note:
-Packet data is rich but expensive. Flow data is lighter but less detailed.
-
----
-
-## 4.3 Log data
-
-Examples:
-- authentication logs;
-- operating system logs;
-- server logs;
-- application logs;
-- firewall and proxy logs;
-- cloud audit trails.
-
-Use cases:
-- suspicious login detection;
-- privilege misuse;
-- lateral movement patterns;
-- incident reconstruction;
-- behavioural analysis.
-
-Teaching note:
-Logs often look structured, but they are messy in practice: missing fields, inconsistent formats, duplicated records, and context gaps are common.
-
----
-
-## 4.4 Endpoint and host telemetry
-
-Examples:
-- process creation;
-- registry modifications;
-- file operations;
-- memory-related indicators;
-- EDR telemetry.
-
-Use cases:
-- malware detection;
-- behavioural analysis;
-- insider-threat indicators;
-- persistence detection.
-
-Teaching note:
-Host data can be very informative but may raise privacy, storage, and deployment issues.
-
----
-
-## 4.5 Email and web data
-
-Examples:
-- headers;
-- subject lines;
-- URLs;
-- attachment metadata;
-- domain properties;
-- webpage features.
-
-Use cases:
-- phishing detection;
-- malicious URL detection;
-- spam filtering;
-- campaign grouping.
-
-Teaching note:
-This is a very accessible teaching domain because students understand email and phishing intuitively.
-
----
-
-## 4.6 Textual and intelligence data
-
-Examples:
-- threat reports;
-- analyst notes;
-- vulnerability descriptions;
-- tickets;
-- incident summaries.
-
-Use cases:
-- summarisation;
-- entity extraction;
-- relationship mapping;
-- analyst assistance;
-- threat intelligence support.
-
-Teaching note:
-This is where generative AI becomes especially visible, but also especially risky.
-
----
-
-## In-class Q&A prompt 3
-
-1. Which of these data types is likely to be most structured?
-2. Which is likely to be richest in context?
-3. Which is likely to be easiest to collect but hardest to trust?
-4. Why might the same attack look different in network data and host data?
-
----
-
-## Mini activity — Match data to task
-
-Give the class a quick matching exercise:
-
-| Task | Most relevant data source |
-|---|---|
-| DDoS detection | network flow data |
-| suspicious admin login | authentication logs |
-| phishing detection | email metadata + text + URLs |
-| malware behaviour analysis | endpoint telemetry |
-| report summarisation | textual threat intelligence |
-
-Then ask:
-> Could any of these tasks be solved with only one data source?
-
-This opens discussion about multimodal and partial visibility.
-
----
-
-# Part 5 — Framing Cybersecurity Problems as AI Problems
-
-## 5.1 Why framing matters more than students expect
-
-One of the deepest skills in applied AI is not coding the model. It is **defining the problem correctly**.
-
-A badly framed problem leads to:
-
-- the wrong data;
-- the wrong labels;
-- the wrong metrics;
-- the wrong deployment choice;
-- the wrong expectations.
-
----
-
-## 5.2 Example: suspicious login detection
-
-Suppose a university wants help detecting suspicious logins.
-
-This can be framed in multiple ways.
-
-### Framing A — Binary classification
-Question: is this login suspicious or benign?
-
-### Framing B — Anomaly detection
-Question: how unusual is this login relative to typical behaviour?
-
-### Framing C — Ranking
-Question: which logins should analysts inspect first?
-
-### Framing D — Clustering
-Question: are several suspicious logins part of the same campaign?
-
-### Framing E — Summarisation
-Question: can the system produce a short explanation to help the analyst?
-
-Each framing changes:
-
-- what data is needed;
-- how labels are defined;
-- what outputs are produced;
-- how performance is measured;
-- what the human user expects.
-
----
-
-## 5.3 The five problem-framing questions
-
-Before choosing an algorithm, ask:
-
-1. **What is the operational question?**  
-   Not “build an AI model,” but “support which decision?”
-
-2. **Who will use the output?**  
-   Analyst, manager, developer, incident responder, end user?
-
-3. **What data is actually available at decision time?**  
-   Not later, not after investigation, but at the moment of need.
-
-4. **Which mistakes are most costly?**  
-   False positives? False negatives? Delay? Opaqueness?
-
-5. **What does success mean operationally?**  
-   Fewer misses? Faster triage? Reduced analyst workload? Better consistency?
-
----
-
-## Instructor board-work idea
-
-Draw the following on the board:
+It does **not** only mean building a model. It means designing a complete decision-support process:
 
 ```text
-Cyber problem → Framing choice → Data choice → Model choice → Metric choice → Deployment role
+Security problem
+→ observable behaviour
+→ telemetry
+→ features
+→ labels or assumptions
+→ model
+→ prediction
+→ interpretation
+→ security decision
 ```
 
-Then walk through a phishing example live.
+For example, suppose we want to detect phishing emails.
 
-This helps students see that the model is only one component in a longer chain of decisions.
+A weak way to describe the problem is:
 
----
+```text
+Train an AI model to detect phishing.
+```
 
-## In-class Q&A prompt 4
+A stronger way is:
 
-1. Can the same cyber problem be framed as both classification and anomaly detection?
-2. Why might ranking be more useful than hard yes/no classification?
-3. If analysts are overloaded, is perfect recall always the best goal?
-4. What happens if the model is trained on information unavailable at decision time?
+```text
+Use email metadata, sender reputation, URL features, text patterns, and attachment indicators to estimate whether an email is likely to be phishing, then decide whether to deliver, warn, quarantine, or escalate it.
+```
 
----
-
-# Part 6 — Why Many AI-for-Cyber Projects Fail
-
-## 6.1 Students often think failure begins with the wrong algorithm
-
-In reality, many projects fail before modelling even begins.
+The second version is better because it connects the model to the real security decision.
 
 ---
 
-## 6.2 Failure mode 1 — Poor problem definition
+# 4. Why AI Is Used in Cybersecurity
 
-Teams may say:
-> “We want AI for threat detection.”
+AI is used in cybersecurity because cyber defence is often:
 
-But that statement is incomplete unless they define:
+- Data-rich
+- Time-sensitive
+- Pattern-based
+- Uncertain
+- Adversarial
 
-- what threat;
-- which decision point;
-- which user;
-- which time constraint;
-- which success criterion;
-- which tolerance for false alarms.
+Human analysts cannot manually inspect all logs, packets, files, emails, alerts, or cloud events. AI can help detect patterns that would be difficult to identify manually.
 
-Without this, even a good model may solve the wrong problem.
+However, AI does not remove the need for human expertise. In many cases, the model output is only a recommendation. A security professional still needs to interpret the output, consider context, and decide what action is appropriate.
 
 ---
 
-## 6.3 Failure mode 2 — Bad or unrealistic data
+# 5. Main Cybersecurity Use Cases for AI
 
-Common issues:
-- missing values;
-- inconsistent labels;
-- over-cleaned benchmark datasets;
-- unrealistic simulation data;
-- hidden leakage;
-- historical bias in labels;
-- stale or unrepresentative data.
+| Cybersecurity Area | Example AI Task |
+|---|---|
+| Network intrusion detection | Classify network flows as benign or malicious |
+| DDoS detection | Detect abnormal traffic surges or resource exhaustion |
+| Malware detection | Classify files or behaviours as malicious |
+| Phishing detection | Identify suspicious emails, links, or attachments |
+| Malicious URL detection | Classify URLs based on lexical and reputation features |
+| Account compromise detection | Detect abnormal login or access behaviour |
+| Insider threat detection | Identify abnormal behaviour by trusted users |
+| Cloud security | Detect abnormal API calls, storage access, or misconfiguration |
+| IoT security | Detect compromised or abnormal devices |
+| Vulnerability prioritisation | Rank vulnerabilities by exploitability and asset impact |
+| SOC alert triage | Prioritise alerts for analyst investigation |
+| Threat intelligence | Cluster indicators, summarise reports, and map behaviours |
+
+---
+
+# 6. Security Data, Features, Labels, Models, and Decisions
+
+A common mistake is to jump directly from “data” to “AI model”. In cybersecurity, we need to understand each stage.
+
+| Concept | Meaning | Cybersecurity Example |
+|---|---|---|
+| Security data | Raw recorded information | Network logs, emails, files, login records |
+| Feature | Measurable input used by a model | Request rate, URL length, failed login count |
+| Label | Known class used for training or evaluation | Benign, phishing, malware, DDoS |
+| Model | AI method that learns patterns | Decision tree, random forest, neural network |
+| Prediction | Model output | “Phishing probability = 0.87” |
+| Decision | Security action based on prediction | Warn user, quarantine email, escalate alert |
+
+Important distinction:
+
+> A prediction is not the same as a security decision.
+
+A model may predict that an event is suspicious. The organisation still needs to decide whether to block, monitor, escalate, quarantine, or ignore.
+
+---
+
+# 7. Security Data Types
+
+Different cybersecurity tasks use different data.
+
+| Data Type | Example | Possible AI Use |
+|---|---|---|
+| Network flows | Source IP, destination IP, bytes, duration | Intrusion and DDoS detection |
+| Packet captures | Packet headers and payloads | Protocol analysis and malware traffic detection |
+| Authentication logs | Login time, user, location, MFA result | Account compromise detection |
+| Endpoint logs | Process name, parent process, command line | Malware and suspicious behaviour detection |
+| Executable files | PE headers, imported libraries, strings | Malware classification |
+| Emails | Sender, subject, links, attachments, body text | Phishing detection |
+| URLs | Domain age, length, entropy, redirects | Malicious URL detection |
+| DNS logs | Queried domains, frequency, entropy | Botnet and command-and-control detection |
+| Cloud logs | API calls, storage access, identity activity | Cloud threat detection |
+| Vulnerability data | CVSS score, exploit availability, asset criticality | Vulnerability prioritisation |
+| Security alerts | Alert type, severity, source, related events | SOC triage and alert prioritisation |
+
+---
+
+# 8. From Raw Data to Features
+
+AI models usually need structured features. A feature is a measurable representation of behaviour.
+
+| Raw Security Observation | Possible Feature |
+|---|---|
+| 50 failed logins in 2 minutes | `failed_login_rate` |
+| Download from unknown domain | `domain_reputation_score` |
+| Large outbound transfer | `outbound_bytes` |
+| Many requests to one server | `request_rate` |
+| Email contains urgent password reset link | `urgency_keyword_flag` |
+| URL contains random-looking characters | `url_entropy` |
+| PowerShell runs encoded command | `encoded_command_flag` |
+| Executable imports suspicious APIs | `suspicious_import_count` |
+| DNS query repeats every 60 seconds | `dns_periodicity_score` |
+| User logs in from unusual country | `geo_anomaly_score` |
 
 Key point:
-**Garbage in, impressive-looking garbage out.**
+
+> Feature engineering is where cybersecurity knowledge meets machine learning.
 
 ---
 
-## 6.4 Failure mode 3 — Weak evaluation
+# 9. Main AI Problem Types in Cybersecurity
 
-A model can have high accuracy and still be operationally poor.
+## 9.1 Classification
 
-If malicious events are rare, a model can appear excellent while missing the attacks that matter.
+Classification is used when we have labelled examples.
 
-Important metrics in security may include:
-- precision;
-- recall;
-- F1-score;
-- false-positive burden;
-- false-negative cost;
-- analyst time saved;
-- triage quality.
+Example:
 
----
+```text
+Input: email features
+Output: phishing or benign
+```
 
-## 6.5 Failure mode 4 — Distribution shift and drift
+Used for:
 
-The environment changes:
-- attackers adapt;
-- users change behaviour;
-- infrastructure changes;
-- software versions change;
-- logging quality shifts.
+- Phishing detection
+- Malware classification
+- Intrusion classification
+- Malicious URL detection
 
-A model trained in one context may become unreliable later.
+Example features for phishing classification:
 
----
-
-## 6.6 Failure mode 5 — Lack of trust and interpretability
-
-A model may technically work, but still fail organisationally if:
-
-- analysts do not trust it;
-- outputs are too opaque;
-- explanations are weak;
-- workflow integration is poor;
-- the system adds burden instead of reducing it.
+| Feature | Meaning |
+|---|---|
+| Sender reputation | Whether the sender has a suspicious history |
+| URL mismatch | Link text and actual URL differ |
+| Domain age | Recently registered domains may be suspicious |
+| Urgency keywords | Words such as “urgent”, “verify”, “password” |
+| Attachment type | Executable or macro-enabled attachment |
 
 ---
 
-## Interactive case pause
+## 9.2 Anomaly Detection
 
-Ask:
+Anomaly detection is used when we do not have enough labelled attack examples. The model learns what normal behaviour looks like and flags deviations.
 
-> Which is worse: a model with modest performance that analysts trust and use, or a technically stronger model that analysts ignore?
+Example:
 
-Let students argue both sides for 4 minutes.
+```text
+Input: user login behaviour
+Output: normal or anomalous
+```
 
-Then conclude:
-Technical strength without adoption may produce little operational value.
+Used for:
 
----
+- Insider threat detection
+- DDoS detection
+- User behaviour analytics
+- IoT anomaly detection
+- Cloud account misuse
 
-# Part 7 — Strengths and Limitations of AI in Cybersecurity
+Important warning:
 
-## 7.1 Strengths
+> An anomaly is not automatically an attack.
 
-AI can be very useful for:
-
-- scaling analysis to large data volumes;
-- surfacing subtle patterns;
-- handling repetitive triage tasks;
-- prioritising likely-important cases;
-- assisting with text-heavy security work;
-- learning from historical examples;
-- supporting, though not replacing, security teams.
+For example, a user logging in from a new country may be suspicious. But it may also be normal if the user is travelling.
 
 ---
 
-## 7.2 Limitations
+## 9.3 Risk Scoring
 
-AI struggles when:
+Risk scoring assigns a risk value to an event, user, file, URL, vulnerability, or incident.
 
-- high-quality labels do not exist;
-- attacker behaviour changes rapidly;
-- systems require strong causal understanding;
-- costs of false positives are severe;
-- models are deployed without human oversight;
-- environments are dynamic but monitoring is weak;
-- students or practitioners confuse benchmark performance with operational success.
+Example:
 
----
+```text
+Input: login location + device + time + file access
+Output: risk score = 78/100
+```
 
-## 7.3 The balanced position
+Used for:
 
-State this clearly in class:
+- SOC alert triage
+- Vulnerability prioritisation
+- Fraud detection
+- Access risk assessment
+- Incident prioritisation
 
-> AI is neither a miracle nor a gimmick.  
-> It is a family of techniques that can help cybersecurity when the problem, data, metrics, workflow, and deployment assumptions are aligned.
-
-This balanced position is the intellectual foundation for the rest of the module.
+A risk score should normally be explainable. Analysts need to know why the system assigned a high score.
 
 ---
 
-# Part 8 — Guided Case Discussion: AI for Phishing Detection
+# 10. Case Study 1: Phishing Email Detection
 
-## 8.1 Scenario
+## Scenario
 
-A university wants to reduce phishing incidents.
+A student receives this email:
 
-It is considering an AI-enabled system to flag suspicious emails before users click on them.
+```text
+Subject: URGENT: Verify your university account
 
----
+Dear user,
 
-## 8.2 Possible data
+Your university mailbox will be disabled today unless you verify your account.
 
-- sender domain;
-- SPF/DKIM/DMARC status;
-- URL features;
-- message structure;
-- attachment type;
-- lexical cues;
-- prior reports from users;
-- historical outcomes.
+Click here to confirm your password:
+http://university-support-login.example-security-check.com
 
----
+Regards,
+IT Support Team
+```
 
-## 8.3 Possible approaches
+## Security Question
 
-- rule-based filtering;
-- engineered-feature machine learning;
-- anomaly detection;
-- NLP-based classification;
-- LLM-assisted explanation for analysts.
+Is this email legitimate or phishing?
 
----
+## Possible Features
 
-## 8.4 Questions for classroom discussion
+| Feature | Value | Interpretation |
+|---|---|---|
+| Urgency keywords | Present | Suspicious |
+| Password request | Present | Suspicious |
+| Sender identity | Unknown | Suspicious |
+| URL domain | Not official university domain | Suspicious |
+| Link text | Claims university support | Suspicious |
+| Attachment | None | Neutral |
+| Personalisation | Generic “Dear user” | Suspicious |
 
-1. Is the goal blocking, triage, or analyst support?
-2. What is the cost of a false positive in a university setting?
-3. How might attackers adapt once the model is deployed?
-4. Should the system explain its output to analysts?
-5. Should the university allow auto-quarantine based on model confidence alone?
-6. What happens if the LLM gives a fluent but wrong explanation?
+## AI Framing
 
----
+This can be framed as a classification problem:
 
-## Small group task
+```text
+Input: email features
+Output: phishing or benign
+```
 
-Break the class into small groups.
+## Security Decision
 
-Ask each group to recommend one of the following:
+Possible decisions:
 
-- rule-based only;
-- ML-assisted triage;
-- full AI-based filtering;
-- hybrid rule + ML + human review.
+| Model Output | Possible Decision |
+|---|---|
+| Low phishing risk | Deliver normally |
+| Medium phishing risk | Deliver with warning banner |
+| High phishing risk | Quarantine and alert user |
+| Very high phishing risk | Block and report to security team |
 
-Each group must justify:
-- what problem is being solved;
-- what mistakes matter most;
-- what level of human oversight is needed.
+## Discussion
 
-This makes the lecture genuinely interactive and prepares students for later assessment logic.
+A phishing detector should not be evaluated only by accuracy. Missing a phishing email may lead to credential theft. Blocking too many legitimate emails may disrupt communication.
 
 ---
 
-# Part 9 — Classroom Checks for Understanding
+# 11. Case Study 2: DDoS Detection
 
-## Concept check questions
+## Scenario
 
-Use these during the lecture:
+A university web service receives a sudden traffic surge.
 
-1. Why is cybersecurity particularly attractive for AI applications?
-2. Why is AI not automatically the correct solution?
-3. What is the difference between machine learning and generative AI?
-4. Why is a detection model not the same thing as a security workflow?
-5. Why can a model with high accuracy still be operationally poor?
-6. Why must cyber tasks be framed carefully before model selection?
-7. Why is trust by analysts an important part of system success?
+```text
+Normal rate: 300 requests/minute
+Current rate: 30,000 requests/minute
+API latency: increased from 200 ms to 4 seconds
+Failed logins: increased by 8x
+Payment errors: increasing
+```
 
----
+## Security Question
 
-## Short-answer in-class quiz
+Is this a DDoS attack?
 
-You can end the lecture with 5 quick questions:
+## Possible Features
 
-1. Name two differences between machine learning and generative AI.
-2. Give two examples of cybersecurity data sources.
-3. Explain one reason an AI-for-cyber project may fail before deployment.
-4. Give one example of a cyber task that may be better solved by ranking than classification.
-5. Explain in one sentence why notebook performance is not enough.
+| Feature | Meaning |
+|---|---|
+| Request rate | Number of requests per minute |
+| Source IP diversity | Number of unique IP addresses |
+| User-agent diversity | Variety of browser/client identifiers |
+| Endpoint distribution | Whether traffic targets one endpoint or many |
+| Session completion rate | Whether users follow normal behaviour |
+| Error rate | Application failures and timeouts |
+| Geo-distribution | Countries or regions of traffic sources |
+| Historical baseline | Normal traffic for this service |
 
----
+## AI Framing
 
-# Part 10 — Lecturer Notes and Teaching Advice
+This may be framed as:
 
-## What to emphasise verbally
+```text
+Anomaly detection
+```
 
-- The course is not anti-AI.
-- The course is not uncritically pro-AI.
-- The course is about professional judgement.
-- Students must learn to ask better questions, not just run models.
+or:
 
-## What students may struggle with
+```text
+Classification if labelled DDoS and benign traffic examples are available
+```
 
-- distinguishing AI from ML and GenAI;
-- understanding why “more advanced model” is not always better;
-- appreciating operational metrics rather than abstract performance;
-- grasping that data quality often dominates model quality.
+## Important Distinction
 
-## What to repeat more than once
+High traffic is not automatically DDoS.
 
-- frame the problem first;
-- data and labels matter;
-- metrics must reflect operational reality;
-- the workflow matters, not just the model;
-- human trust and interpretability affect adoption.
+It could be:
 
----
+- A legitimate flash crowd
+- A marketing campaign
+- A course registration opening
+- A broken client retrying requests
+- A bot attack
+- An application-layer DDoS
 
-# Part 11 — Suggested Slides Structure
+## Security Decision
 
-If you turn this into slides, a good sequence is:
+Possible responses:
 
-1. Title and central question
-2. Why cybersecurity is attractive for AI
-3. Why attraction does not equal suitability
-4. AI vs ML vs DL vs GenAI
-5. Cybersecurity workflow and where AI fits
-6. Types of cybersecurity data
-7. Mini polling question
-8. Framing cyber problems correctly
-9. Suspicious login example
-10. Why AI-for-cyber projects fail
-11. Strengths and limitations
-12. Phishing case discussion
-13. Concept check questions
-14. Key terms
-15. Summary and transition to next week
+- Monitor
+- Scale infrastructure
+- Rate-limit suspicious endpoints
+- Apply bot challenge
+- Block malicious IPs
+- Escalate to incident response
+- Avoid broad blocking unless necessary
 
 ---
 
-# Part 12 — Lab Guidance
+# 12. Case Study 3: Malware Detection from Endpoint Behaviour
 
-## Lab theme
-**Exploring a cybersecurity dataset and building a baseline**
+## Scenario
 
-## Purpose
-The lab should reinforce the lecture’s main message:
+An endpoint monitoring system records the following behaviour:
 
-> Before students try sophisticated models, they must understand the dataset, the task, and the meaning of the labels.
+```text
+Process: powershell.exe
+Command: encoded command
+Network: connects to unknown domain
+Action: downloads executable file
+Parent process: winword.exe
+```
 
-## Suggested tasks
+## Security Question
 
-1. load a small cybersecurity dataset;
-2. inspect feature names, data types, and label balance;
-3. identify missing values or suspicious columns;
-4. visualise class imbalance or simple distributions;
-5. create a trivial baseline, such as majority class or a simple decision tree;
-6. write a short reflection on what the dataset does and does not represent.
+Is this malicious behaviour?
 
-## Reflection questions
+## Possible Features
 
-- What decision is the dataset trying to support?
-- What important context is missing?
-- Is the dataset likely to generalise to a real environment?
-- Which errors would be most dangerous?
-- What would an analyst need beyond the model output?
+| Feature | Interpretation |
+|---|---|
+| PowerShell execution | May be legitimate or suspicious |
+| Encoded command | Suspicious |
+| Parent process is Word | Suspicious |
+| Download from unknown domain | Suspicious |
+| Executable download | Suspicious |
+| Domain reputation unknown | Suspicious or uncertain |
 
----
+## AI Framing
 
-# Part 13 — In-Class Q&A Bank
+This may be framed as:
 
-Use these selectively throughout the session.
+```text
+Endpoint behaviour classification
+```
 
-## Session 1 Q&A
-- Why is AI especially attractive in high-volume cyber environments?
-- Can too much data make security worse rather than better?
+or:
 
-## Session 2 Q&A
-- Is generative AI a form of machine learning?
-- Is every machine-learning system “intelligent” in a meaningful sense?
+```text
+Anomaly detection
+```
 
-## Session 3 Q&A
-- Why might logs and packet captures lead to different conclusions?
-- Which data source would you trust most for insider-threat analysis?
+## Why Context Matters
 
-## Session 4 Q&A
-- Why is ranking sometimes more useful than classification?
-- Can anomaly detection work well when the environment changes frequently?
-
-## Session 5 Q&A
-- Why can high accuracy be misleading in security?
-- What is one operational metric you would care about more than accuracy?
-
-## Session 6 Q&A
-- When should AI outputs be advisory only?
-- When, if ever, should AI be allowed to trigger automated action?
+PowerShell is not always malicious. System administrators use it legitimately. But PowerShell launched by a Word document with an encoded command and external download is much more suspicious.
 
 ---
 
-# Part 14 — Key Terms
+# 13. Case Study 4: Cloud Account Activity
 
-- Artificial Intelligence
-- Machine Learning
-- Deep Learning
-- Generative AI
+## Scenario
+
+A cloud administrator creates a new virtual machine at 02:10.
+
+At first glance, this may look suspicious. But the activity occurs during a scheduled maintenance window.
+
+## Security Question
+
+Should this be treated as malicious?
+
+## Possible Interpretation
+
+| Evidence | Interpretation |
+|---|---|
+| Admin creates VM at night | Suspicious without context |
+| Maintenance window exists | Reduces suspicion |
+| Admin account is known | Reduces suspicion |
+| VM image is approved | Reduces suspicion |
+| VM opens public ports | Increases suspicion |
+| No change ticket exists | Increases suspicion |
+
+## Main Lesson
+
+The same event can be benign or suspicious depending on context.
+
+---
+
+# 14. Evaluation: The Most Important Week 1 Topic
+
+In cybersecurity, evaluating AI is difficult because attacks are often rare and costly.
+
+## Confusion Matrix
+
+|  | Predicted Malicious | Predicted Benign |
+|---|---|---|
+| Actually Malicious | True Positive | False Negative |
+| Actually Benign | False Positive | True Negative |
+
+## Cybersecurity Meaning
+
+| Term | Meaning |
+|---|---|
+| True Positive | Attack correctly detected |
+| True Negative | Benign activity correctly ignored |
+| False Positive | Benign activity wrongly flagged as attack |
+| False Negative | Attack missed by the model |
+
+---
+
+# 15. Why Accuracy Alone Is Not Enough
+
+Suppose a dataset contains 10,000 events:
+
+```text
+100 malicious events
+9,900 benign events
+```
+
+A useless model predicts every event as benign.
+
+Results:
+
+```text
+Correct benign predictions = 9,900
+Missed attacks = 100
+Accuracy = 9,900 / 10,000 = 99%
+```
+
+The model has 99% accuracy, but it detects no attacks.
+
+Key lesson:
+
+> High accuracy can hide poor security performance when attacks are rare.
+
+---
+
+# 16. Precision, Recall, and F1-Score
+
+## Precision
+
+Precision answers:
+
+> Of everything the model flagged as malicious, how much was actually malicious?
+
+```text
+Precision = TP / (TP + FP)
+```
+
+High precision means fewer false alarms.
+
+## Recall
+
+Recall answers:
+
+> Of all real malicious cases, how many did the model detect?
+
+```text
+Recall = TP / (TP + FN)
+```
+
+High recall means fewer missed attacks.
+
+## F1-Score
+
+F1-score balances precision and recall.
+
+```text
+F1 = 2 × (Precision × Recall) / (Precision + Recall)
+```
+
+## Security Interpretation
+
+| Metric | Why It Matters |
+|---|---|
+| Precision | Analyst workload and alert fatigue |
+| Recall | Ability to catch attacks |
+| F1-score | Balance between false alarms and missed attacks |
+| False positive rate | Operational disruption |
+| False negative rate | Security exposure |
+
+---
+
+# 17. Why AI for Cybersecurity Is Difficult
+
+| Challenge | Explanation |
+|---|---|
+| Class imbalance | Attacks are usually much rarer than benign events |
+| Poor labels | Security labels may be missing, delayed, or wrong |
+| Concept drift | Normal behaviour and attack behaviour change over time |
+| Adversarial behaviour | Attackers deliberately adapt to evade detection |
+| Noisy data | Logs may be incomplete, duplicated, or inconsistent |
+| Context dependence | The same behaviour may be benign or malicious depending on context |
+| Explainability | Analysts need reasons, not only predictions |
+| Automation risk | Wrong automated actions can disrupt systems |
+| Privacy | Security data may contain sensitive user information |
+| Generalisation | Models trained in one environment may fail in another |
+
+Core statement:
+
+> Cybersecurity is an adversarial domain. Attackers react to defenders, so the data distribution is not stable.
+
+---
+
+# 18. Summary of Key Ideas
+
+This week introduced the foundations of Applied AI for Cybersecurity.
+
+Main points:
+
+- AI can support cybersecurity, but it is not a magic solution.
+- Security problems must be translated carefully into AI problems.
+- Cybersecurity data must be converted into meaningful features.
+- Predictions are not the same as decisions.
+- Accuracy alone is not enough.
+- False positives and false negatives have different security costs.
+- Context is essential.
+- AI systems can fail because attackers adapt.
+
+---
+
+# 19. Lab Sheet 1: From Security Data to AI Decisions
+
+## Lab Overview
+
+In this lab, you will practise turning security observations into AI-ready reasoning. You will identify security domains, propose features, assign tentative labels, discuss uncertainty, and evaluate model performance.
+
+This is a conceptual and analytical lab. The aim is not advanced coding. The aim is to understand how AI-based cybersecurity systems are designed and evaluated.
+
+---
+
+## Lab Duration
+
+Approximate duration: 90 minutes.
+
+---
+
+## Lab Mode
+
+Individual work followed by small-group discussion.
+
+---
+
+## Lab Objectives
+
+By completing this lab, you should be able to:
+
+1. Identify the security domain of a given event.
+2. Extract possible AI features from security observations.
+3. Assign tentative labels and justify uncertainty.
+4. Explain the cost of false positives and false negatives.
+5. Select a suitable AI problem type.
+6. Calculate basic evaluation metrics.
+7. Explain why accuracy alone is not enough.
+
+---
+
+# 20. Lab Dataset
+
+Use the following simplified security observations.
+
+| Event ID | Source | Observation |
+|---|---|---|
+| E1 | Email | Message claims urgent password reset and links to unknown domain |
+| E2 | Network | 30,000 requests in 2 minutes to one web endpoint |
+| E3 | Login | User logs in from usual device and usual location |
+| E4 | Endpoint | PowerShell executes encoded command and downloads a file |
+| E5 | URL | Domain registered yesterday and contains random-looking characters |
+| E6 | Cloud | Admin creates new VM during scheduled maintenance |
+| E7 | DNS | Host repeatedly queries rare domain every 60 seconds |
+| E8 | File | Executable imports functions often used for process injection |
+| E9 | Web | Many failed login attempts from one IP address |
+| E10 | Endpoint | Antivirus detects malware in already quarantined file |
+
+---
+
+# 21. Lab Task 1 — Identify the Security Domain
+
+For each event, identify the most relevant cybersecurity domain.
+
+| Event ID | Domain |
+|---|---|
+| E1 |  |
+| E2 |  |
+| E3 |  |
+| E4 |  |
+| E5 |  |
+| E6 |  |
+| E7 |  |
+| E8 |  |
+| E9 |  |
+| E10 |  |
+
+Possible domains include:
+
+- Email security
+- Phishing detection
+- Network security
+- DDoS detection
+- Identity and access security
+- Endpoint security
+- Malware detection
+- URL security
+- DNS security
+- Cloud security
+- Web application security
+
+---
+
+# 22. Lab Task 2 — Extract Possible Features
+
+For each event, propose at least two possible features that an AI system could use.
+
+Example:
+
+| Event ID | Possible Features |
+|---|---|
+| E1 | sender reputation, domain age, urgency keywords, URL mismatch |
+| E2 | request rate, endpoint path, source IP diversity, user-agent diversity |
+
+Complete the table:
+
+| Event ID | Possible Features |
+|---|---|
+| E1 |  |
+| E2 |  |
+| E3 |  |
+| E4 |  |
+| E5 |  |
+| E6 |  |
+| E7 |  |
+| E8 |  |
+| E9 |  |
+| E10 |  |
+
+---
+
+# 23. Lab Task 3 — Assign a Tentative Label
+
+Assign one of the following labels to each event:
+
+```text
+Benign
+Suspicious
+Malicious
+Uncertain
+```
+
+Complete the table:
+
+| Event ID | Tentative Label | Reason |
+|---|---|---|
+| E1 |  |  |
+| E2 |  |  |
+| E3 |  |  |
+| E4 |  |  |
+| E5 |  |  |
+| E6 |  |  |
+| E7 |  |  |
+| E8 |  |  |
+| E9 |  |  |
+| E10 |  |  |
+
+Important:
+
+> “Uncertain” is an acceptable answer if you can explain what additional context is needed.
+
+---
+
+# 24. Lab Task 4 — False Positive and False Negative Costs
+
+Choose three events from the dataset.
+
+For each event, describe the cost of a false positive and the cost of a false negative.
+
+| Event ID | False Positive Cost | False Negative Cost |
+|---|---|---|
+|  |  |  |
+|  |  |  |
+|  |  |  |
+
+Example:
+
+| Event | False Positive Cost | False Negative Cost |
+|---|---|---|
+| Phishing email | Legitimate email blocked | User credentials stolen |
+| DDoS traffic | Legitimate users blocked | Service unavailable |
+| Malware execution | Business process interrupted | Host compromised |
+
+Teaching point:
+
+> The best detection threshold depends on the cost of being wrong.
+
+---
+
+# 25. Lab Task 5 — Choose the AI Problem Type
+
+Map each cybersecurity problem to the most suitable AI framing.
+
+Possible AI framings:
+
 - Classification
+- Anomaly detection
+- Risk scoring
 - Ranking
 - Clustering
-- Anomaly Detection
-- Triage
-- Telemetry
-- Feature
-- Label
-- Drift
-- False Positive
-- False Negative
-- Operationalisation
-- Workflow
-- Interpretability
+- Human-in-the-loop decision support
+
+Complete the table:
+
+| Problem | Suitable AI Framing | Reason |
+|---|---|---|
+| Phishing detection |  |  |
+| Malware detection |  |  |
+| DDoS detection |  |  |
+| Insider behaviour detection |  |  |
+| SOC alert prioritisation |  |  |
+| Vulnerability prioritisation |  |  |
+| Malicious URL detection |  |  |
+| DNS botnet detection |  |  |
 
 ---
 
-# Part 15 — End-of-Class Summary
+# 26. Lab Task 6 — Confusion Matrix Exercise
 
-This week introduced the core idea of the module:
+A phishing detector is tested on 1,000 emails.
 
-> **Applied AI for cybersecurity is not mainly about choosing impressive models. It is about aligning security problems, data, metrics, workflows, and operational judgement.**
+Dataset:
 
-Students should now understand:
+```text
+100 phishing emails
+900 benign emails
+```
 
-- why AI matters in cybersecurity;
-- how AI, ML, deep learning, and generative AI differ;
-- what kinds of cyber data are commonly used;
-- why problem framing is a foundational skill;
-- why many AI-for-cyber projects fail before or after deployment;
-- why AI should be treated as useful but fallible.
+Model output:
+
+```text
+80 phishing emails correctly detected
+20 phishing emails missed
+60 benign emails wrongly flagged
+840 benign emails correctly ignored
+```
+
+Complete the confusion matrix:
+
+|  | Predicted Phishing | Predicted Benign |
+|---|---:|---:|
+| Actually Phishing |  |  |
+| Actually Benign |  |  |
+
+Then calculate:
+
+```text
+True positives =
+False negatives =
+False positives =
+True negatives =
+```
+
+Calculate:
+
+```text
+Precision =
+Recall =
+F1-score =
+Accuracy =
+```
 
 ---
 
-# Part 16 — Transition to Week 2
+## Worked Solution
 
-Next week moves from broad conceptual framing to practical modelling foundations.
+```text
+True positives = 80
+False negatives = 20
+False positives = 60
+True negatives = 840
+```
 
-Students will begin working more directly with:
+```text
+Precision = TP / (TP + FP)
+          = 80 / (80 + 60)
+          = 80 / 140
+          = 0.571
+```
 
-- datasets;
-- preprocessing;
-- feature engineering;
-- classical machine learning;
-- evidence-based evaluation.
+```text
+Recall = TP / (TP + FN)
+       = 80 / (80 + 20)
+       = 80 / 100
+       = 0.800
+```
 
-That transition is deliberate.
+```text
+F1-score = 2 × (Precision × Recall) / (Precision + Recall)
+         = 2 × (0.571 × 0.800) / (0.571 + 0.800)
+         ≈ 0.667
+```
 
-Week 1 asks:
-> **What is the problem, and what would responsible AI use look like?**
+```text
+Accuracy = (TP + TN) / Total
+         = (80 + 840) / 1000
+         = 920 / 1000
+         = 0.920
+```
 
-Week 2 asks:
-> **How do we actually prepare cyber data and evaluate models properly?**
+Discussion question:
+
+> Is 92% accuracy good enough?
+
+Possible answer:
+
+Not necessarily. The model still misses 20 phishing emails and wrongly flags 60 benign emails. Whether this is acceptable depends on operational cost.
 
 ---
 
-# Optional homework / reflection
+# 27. Lab Deliverable
 
-Write 250–400 words responding to the statement:
+Submit a short worksheet containing:
 
-> “The hardest problem in AI for cybersecurity is not building a model. It is deciding how much to trust it.”
+1. Security domain classification.
+2. Feature extraction table.
+3. Tentative labels and reasons.
+4. False positive / false negative cost discussion.
+5. AI problem type mapping.
+6. Confusion matrix calculations.
+7. Short reflection: **Why is accuracy alone not enough in cybersecurity?**
 
-Support your answer with at least two ideas from today’s lecture.
+Recommended length:
+
+```text
+800–1200 words
+```
+
+---
+
+# 28. Exercises
+
+## Exercise 1 — Concept Check
+
+Answer briefly.
+
+1. What is the difference between a security event and a security decision?
+2. What is a feature?
+3. What is a label?
+4. Why are labels difficult in cybersecurity?
+5. What is a false positive?
+6. What is a false negative?
+7. Why is class imbalance common in cybersecurity?
+8. Why is anomaly not the same as attack?
+9. Why does cybersecurity require context?
+10. Give one example where an AI model prediction should not automatically trigger a response.
+
+---
+
+## Exercise 2 — Short Analytical Answer
+
+Write 200–300 words.
+
+**Question:**  
+Why is applying AI to cybersecurity more difficult than applying AI to ordinary image or product classification?
+
+Your answer should discuss at least four of the following:
+
+- Adversarial behaviour
+- Concept drift
+- Class imbalance
+- Noisy data
+- Poor labels
+- Context dependence
+- High cost of errors
+- Explainability
+- Privacy
+
+---
+
+## Exercise 3 — Feature Design
+
+For each problem, propose three useful features.
+
+| Problem | Feature 1 | Feature 2 | Feature 3 |
+|---|---|---|---|
+| Phishing detection |  |  |  |
+| DDoS detection |  |  |  |
+| Malware detection |  |  |  |
+| Account compromise |  |  |  |
+| Malicious URL detection |  |  |  |
+| DNS botnet detection |  |  |  |
+| Cloud misuse detection |  |  |  |
+
+---
+
+## Exercise 4 — Evaluation Reflection
+
+A model has 98% accuracy on a cybersecurity dataset.
+
+Answer:
+
+1. Why might this still be a poor model?
+2. What additional metrics would you request?
+3. What would you ask about the dataset?
+4. What would you ask about the cost of false positives and false negatives?
+5. What would you ask before deploying the model?
+
+---
+
+## Exercise 5 — Case Analysis
+
+Read the case below.
+
+```text
+A user logs in from a new country at 03:00.
+The user successfully completes MFA.
+The same user downloads 2 GB of files from cloud storage.
+The user is a senior manager who is currently attending a conference abroad.
+```
+
+Answer:
+
+1. Which observations are suspicious?
+2. Which observations reduce suspicion?
+3. What features could an AI model use?
+4. What additional context is needed?
+5. Should this be labelled benign, suspicious, malicious, or uncertain?
+6. What would be a proportionate security response?
+
+---
+
+## Exercise 6 — Explainability Practice
+
+Rewrite this poor AI output into an analyst-friendly explanation.
+
+Poor output:
+
+```text
+Incident probability: 86%
+Recommended action: Block traffic
+```
+
+Your improved explanation should include:
+
+- Risk-increasing evidence
+- Risk-reducing evidence
+- Missing evidence
+- Recommended next step
+- Whether human approval is required
+
+---
+
+# 29. Further Reading
+
+These readings support the main ideas introduced in Week 1.
+
+## Core Reading
+
+1. **NIST AI Risk Management Framework**  
+   This framework explains how organisations can manage risks related to AI systems, including trustworthiness, accountability, transparency, reliability, safety, and governance.  
+   <https://www.nist.gov/itl/ai-risk-management-framework>  
+   NIST describes the AI RMF as a framework for managing risks to individuals, organisations, and society associated with AI. :contentReference[oaicite:0]{index=0}
+
+2. **NIST SP 800-61 Rev. 3: Incident Response Recommendations and Considerations for Cybersecurity Risk Management**  
+   This publication explains how organisations can improve incident detection, response, and recovery activities.  
+   <https://csrc.nist.gov/pubs/sp/800/61/r3/final>  
+   NIST states that SP 800-61 Rev. 3 helps organisations prepare for incident response, reduce incident impact, and improve detection, response, and recovery activities. :contentReference[oaicite:1]{index=1}
+
+3. **MITRE ATT&CK Enterprise Matrix**  
+   MITRE ATT&CK provides a structured way to describe adversary tactics and techniques. It is useful for connecting security evidence to attacker behaviour.  
+   <https://attack.mitre.org/matrices/enterprise/>  
+   The Enterprise Matrix covers platforms including Windows, macOS, Linux, SaaS, IaaS, identity providers, network devices, containers, and others. :contentReference[oaicite:2]{index=2}
+
+4. **CISA Cybersecurity Incident and Vulnerability Response Playbooks**  
+   These playbooks provide practical response guidance for cybersecurity incidents and vulnerabilities.  
+   <https://www.cisa.gov/planning-response-recovery>  
+   CISA describes these playbooks as guidance for incident response and vulnerability response. :contentReference[oaicite:3]{index=3}
+
+---
+
+## Suggested Topics to Explore
+
+Search for recent academic or industry material on:
+
+- Machine learning for intrusion detection
+- Machine learning for DDoS detection
+- Phishing detection using natural language processing
+- Malware detection using static and dynamic analysis
+- Explainable AI for cybersecurity
+- Adversarial machine learning
+- Concept drift in intrusion detection
+- Human-in-the-loop cybersecurity
+- AI risk management
+- Security analytics and alert prioritisation
+
+---
+
+# 30. Week 1 Summary
+
+This week introduced the foundation of Applied AI for Cybersecurity.
+
+The most important lessons are:
+
+```text
+AI in cybersecurity starts with a security problem, not with a model.
+
+Security data must be transformed into meaningful features.
+
+Predictions are not the same as decisions.
+
+Accuracy alone can be misleading.
+
+False positives and false negatives have different operational costs.
+
+Context is essential.
+
+Cybersecurity is adversarial, so AI models must be evaluated and deployed carefully.
+```
+
+Final takeaway:
+
+> A good AI-based cybersecurity system is not simply the one with the highest accuracy.  
+> It is the one that supports reliable, explainable, and proportionate security decisions.
