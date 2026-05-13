@@ -1,10 +1,10 @@
 ---
-title: "Week 4: AI for Malware, Phishing, and Malicious URL Detection"
+title: "Week 04: AI for Malware, Phishing, and Malicious URL Detection"
 layout: default
-permalink: /lectures/week4-1/
+permalink: /lectures/week04/
 ---
 
-# Week 4: AI for Malware, Phishing, and Malicious URL Detection  
+# Week 04: AI for Malware, Phishing, and Malicious URL Detection  
 ## From Digital Artefacts to Threat Classification
 
 Welcome to Week 4 of **Applied AI for Cybersecurity**.
