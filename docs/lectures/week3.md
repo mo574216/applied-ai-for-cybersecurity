@@ -1,365 +1,1424 @@
 ---
-title: "Week 3 — Deep Learning and Generative AI in Cybersecurity"
+title: "Week 3: AI for Malware, Phishing, and Malicious URL Detection"
 layout: default
-permalink: "/lectures/week3/"
+permalink: /lectures/week3/
 ---
 
-# Week 3 — Deep Learning and Generative AI in Cybersecurity
+# Week 3: AI for Malware, Phishing, and Malicious URL Detection  
+## From Digital Artefacts to Threat Classification
 
-## Overview
+Welcome to Week 3 of **Applied AI for Cybersecurity**.
 
-This week examines two major developments in modern cybersecurity analytics:
+In Week 1, we studied the foundations of applying AI to cybersecurity problems. In Week 2, we focused on network intrusion and DDoS detection. This week moves from network traffic to another major area of cyber defence:
 
-1. the use of deep learning for complex cyber data;
-2. the use of generative AI and large language models in cyber workflows.
+> **Detecting malicious artefacts such as phishing emails, malicious URLs, and malware samples.**
 
-Deep learning is useful when data is high-dimensional, sequential, or difficult to represent using a small set of hand-engineered features. Generative AI is useful when the task involves language, code, explanation, summarisation, or conversational support.
+The main question for this week is:
 
-These technologies are powerful, but they should not be treated as automatic upgrades over classical methods. Their value depends on the task, the data, and the deployment context.
-
----
-
-## Learning Outcomes
-
-By the end of this week, students should be able to:
-
-1. explain why deep learning may be useful for certain cybersecurity data types;
-2. identify common cyber use cases for neural networks and representation learning;
-3. describe practical uses of generative AI and LLMs in security operations;
-4. evaluate the benefits and weaknesses of GenAI-supported cyber workflows;
-5. discuss risks such as hallucination, overconfidence, and unsafe automation.
+> How can AI help us classify suspicious files, emails, URLs, and behaviours, and what are the limitations of this approach?
 
 ---
 
-## 1. Why deep learning entered cybersecurity
+# 1. Learning Objectives
 
-Classical machine learning often depends on engineered features. Deep learning became attractive because it can learn internal representations from raw or semi-structured data.
+By the end of this week, you should be able to:
 
-This matters in cybersecurity because many cyber artefacts are:
+1. Explain how AI is used for malware, phishing, and malicious URL detection.
+2. Distinguish between static, dynamic, and behavioural malware analysis.
+3. Identify useful features for malware detection.
+4. Identify useful features for phishing email detection.
+5. Identify useful features for malicious URL detection.
+6. Explain how classification models can be used for artefact-based threat detection.
+7. Explain why feature engineering is important in malware and phishing detection.
+8. Discuss why attackers can evade AI-based detection.
+9. Evaluate malware and phishing detectors using suitable metrics.
+10. Explain the limitations of public malware and phishing datasets.
 
-- sequential;
-- variable in length;
-- high-dimensional;
-- partly unstructured;
-- context-sensitive.
+---
+
+# 2. Why This Topic Matters
+
+Many cyberattacks begin with a malicious artefact.
 
 Examples include:
 
-- packet or flow sequences;
-- command histories;
-- process trees;
-- log streams;
-- malware byte sequences or API call traces;
-- phishing message text;
-- threat intelligence reports.
+- A phishing email that steals credentials
+- A malicious URL that leads to a fake login page
+- A file attachment that installs malware
+- A macro-enabled document that downloads a payload
+- A trojanised software installer
+- A script that runs encoded commands
+- A malware sample that communicates with command-and-control infrastructure
 
-Deep learning is especially useful when the relationships in the data are complex and not easy to express as a small manual feature set.
+AI is useful because defenders must analyse large numbers of emails, URLs, files, and behaviours. Manual inspection does not scale.
 
----
-
-## 2. Neural network ideas in simple terms
-
-A neural network takes input data and transforms it through layers to learn increasingly useful representations.
-
-For this module, the important intuition is not heavy mathematics but the following:
-
-- early layers may learn local or low-level patterns;
-- deeper layers may capture more abstract structure;
-- the network learns these patterns from examples rather than from hand-written rules.
-
-### Practical implication
-
-If the data contains rich structure, deep learning may discover patterns that manual feature engineering misses.
-
-### Practical warning
-
-If the data is small, biased, noisy, or unrealistic, deep learning may simply learn these problems more efficiently.
+However, AI-based detection is difficult because attackers actively change their artefacts to bypass detection.
 
 ---
 
-## 3. Deep learning use cases in cybersecurity
+# 3. Malware, Phishing, and Malicious URLs
 
-### 3.1 Malware analysis
+## 3.1 Malware
 
-Possible inputs:
-- byte sequences;
-- opcode sequences;
-- API call traces;
-- behavioural event streams.
+Malware is software designed to perform unauthorised or harmful actions.
 
-Possible outputs:
-- benign vs malicious;
-- malware family classification;
-- behavioural clustering.
+Common malware types include:
 
-### 3.2 Network and traffic analysis
+| Malware Type | Description |
+|---|---|
+| Virus | Attaches to other files and spreads when executed |
+| Worm | Self-propagates across systems or networks |
+| Trojan | Pretends to be legitimate software |
+| Ransomware | Encrypts or blocks access to data and demands payment |
+| Spyware | Steals information from a system |
+| Keylogger | Records keystrokes |
+| Bot | Turns a host into part of a botnet |
+| Rootkit | Hides malicious activity and maintains privileged access |
+| Downloader | Downloads additional malicious payloads |
+| Backdoor | Provides hidden access to the attacker |
 
-Possible inputs:
-- packet timing;
-- flow sequences;
-- encrypted traffic metadata;
-- session patterns.
-
-Possible tasks:
-- intrusion detection;
-- DDoS detection;
-- application classification;
-- anomaly detection.
-
-### 3.3 Log and event sequence analysis
-
-Deep learning may be useful for:
-- detecting unusual sequences of system events;
-- modelling normal behaviour and finding deviations;
-- supporting incident timeline interpretation.
-
-### 3.4 Phishing and text analysis
-
-Possible tasks:
-- classifying phishing text;
-- detecting social-engineering cues;
-- extracting threat intelligence entities;
-- clustering related campaigns.
+Malware detection may use file properties, code structure, imported libraries, strings, system calls, network behaviour, and runtime actions.
 
 ---
 
-## 4. Representation learning and embeddings
+## 3.2 Phishing
 
-A representation is a transformed version of the input that captures useful structure.
+Phishing is a social engineering attack where the attacker sends a deceptive message to trick the victim into revealing information, clicking a link, opening an attachment, or performing an unsafe action.
 
-Embeddings are numerical vector representations that place related items closer together in a learned space.
+MITRE ATT&CK describes phishing as electronically delivered social engineering, including mass phishing and targeted spearphishing. Phishing messages may be used to gain access to victim systems or deliver malware. Further reading: [MITRE ATT&CK: Phishing T1566](https://attack.mitre.org/techniques/T1566/).  
 
-In cybersecurity, embeddings can help with:
+Phishing may occur through:
 
-- clustering similar alerts;
-- comparing related malware samples;
-- grouping similar domains or URLs;
-- mapping textual reports into searchable vector spaces.
-
-This is important because security analysts often care not only about yes/no decisions, but also about similarity, relationship, and context.
-
----
-
-## 5. Where deep learning helps and where it does not
-
-### Deep learning may help when:
-- there is a large volume of relevant data;
-- the data has rich internal structure;
-- manual features are hard to design;
-- the task benefits from learned representations.
-
-### Deep learning may not help when:
-- the dataset is small or low-quality;
-- the operational question is simple;
-- interpretability is critical;
-- a classical baseline already performs well;
-- deployment constraints make deep models too costly or too opaque.
-
-Students should resist the idea that deep learning is inherently superior. The right question is whether it improves the actual security workflow.
+- Email
+- SMS
+- Social media
+- Messaging platforms
+- Collaboration tools
+- Fake login pages
+- Malicious attachments
+- QR codes
+- Cloud sharing links
 
 ---
 
-## 6. Generative AI and LLMs in cybersecurity
+## 3.3 Malicious URLs
 
-Large language models are increasingly used because much security work involves language:
+A malicious URL is a web address used for harmful purposes.
 
-- alerts;
-- analyst notes;
-- incident tickets;
-- threat reports;
-- vulnerability descriptions;
-- detection rules;
-- code snippets;
-- security guidance.
+Examples include URLs that lead to:
 
-### Potential LLM-supported tasks
+- Phishing pages
+- Malware downloads
+- Fake login pages
+- Drive-by downloads
+- Scam pages
+- Command-and-control infrastructure
+- Credential harvesting sites
 
-- summarising long alerts or reports;
-- explaining suspicious events in plain language;
-- drafting detection rules or queries;
-- assisting with documentation;
-- helping analysts triage cases;
-- supporting secure coding review;
-- transforming natural language requests into search or investigation steps.
+Malicious URL detection can be based on:
 
-### Example
+- URL structure
+- Domain reputation
+- Domain age
+- Redirect behaviour
+- Hosting information
+- Lexical patterns
+- Page content
+- Threat intelligence
 
-A SOC analyst may receive a large, messy alert with multiple IPs, processes, and timestamps. An LLM could help produce:
-
-- a concise narrative summary;
-- a list of key indicators;
-- candidate next investigation steps;
-- a note for escalation.
+URLhaus is an example of a threat-intelligence platform that shares malicious URLs used for malware distribution. Further reading: [URLhaus by abuse.ch](https://urlhaus.abuse.ch/).  
 
 ---
 
-## 7. Benefits of GenAI in cyber workflows
+# 4. Static, Dynamic, and Behavioural Analysis
 
-### 7.1 Speed
-Generative models can reduce time spent on repetitive reading and drafting.
+Malware and artefact detection can be approached in different ways.
 
-### 7.2 Accessibility
-They can help junior analysts understand unfamiliar outputs or concepts.
+## 4.1 Static Analysis
 
-### 7.3 Natural language interaction
-They allow human-friendly interfaces over complex data and tooling.
+Static analysis examines an artefact without executing it.
 
-### 7.4 Support for documentation and communication
-They can assist with incident summaries, playbook drafting, or explanation for mixed audiences.
+For malware detection, this may include:
 
----
+- File hash
+- File size
+- File type
+- PE header fields
+- Imported libraries
+- Strings
+- Byte sequences
+- Opcodes
+- Entropy
+- Sections
+- Digital signature information
+- Packer indicators
 
-## 8. Limitations and risks of GenAI
+Example:
 
-Students must treat LLMs critically.
+```text
+File: invoice_update.exe
+Imported APIs: CreateRemoteThread, VirtualAlloc, WriteProcessMemory
+Strings: http://unknown-domain.example/payload
+Entropy: high
+Digital signature: missing
+```
 
-### 8.1 Hallucination
-The model may produce plausible but false information.
+Possible interpretation:
 
-### 8.2 Overconfidence
-The tone may sound certain even when the content is weak or fabricated.
+```text
+The file may be suspicious because it imports APIs often associated with process injection, contains an unknown download URL, has high entropy, and is unsigned.
+```
 
-### 8.3 Prompt sensitivity
-Small wording changes may alter outputs significantly.
+### Advantages of static analysis
 
-### 8.4 Context limitations
-The model may misunderstand the environment, missing technical detail or organisational nuance.
+- Fast
+- Scalable
+- Safe because the file is not executed
+- Suitable for large-scale screening
 
-### 8.5 Privacy and confidentiality
-Sensitive logs, code, or incident details may be exposed if handled unsafely.
+### Limitations of static analysis
 
-### 8.6 Unsafe automation
-If an LLM is allowed to trigger actions directly, the risk increases significantly.
-
----
-
-## 9. Human-in-the-loop design
-
-A good operational design often keeps humans responsible for interpretation and action.
-
-### Safer pattern
-- model assists;
-- analyst reviews;
-- analyst decides.
-
-### Riskier pattern
-- model interprets;
-- model acts automatically;
-- humans review only after impact.
-
-In many cyber contexts, LLMs are best used first as **support tools**, not autonomous agents.
+- Obfuscation can hide useful features
+- Packers can change file structure
+- Static features may not reveal runtime behaviour
+- Benign software may share some suspicious features
 
 ---
 
-## 10. Case discussion: LLM support in a SOC
+## 4.2 Dynamic Analysis
 
-Suppose a SOC wants to deploy an LLM assistant.
+Dynamic analysis observes an artefact while it runs in a controlled environment, such as a sandbox.
 
-### Candidate tasks
-- explain SIEM alerts;
-- summarise incident tickets;
-- suggest investigation questions;
-- map plain-language requests to security queries.
+Dynamic analysis may record:
 
-### Benefits
-- reduced triage time;
-- better support for junior analysts;
-- improved documentation quality.
+- Files created or modified
+- Registry changes
+- Processes launched
+- Network connections
+- DNS queries
+- System calls
+- Persistence mechanisms
+- Command execution
+- Attempts to disable security tools
 
-### Risks
-- fabricated explanations;
-- misleading recommendations;
-- leakage of sensitive case data;
-- prompt manipulation;
-- analyst overreliance.
+Example:
 
-### Key design questions
-- What data can the model see?
-- What output is the analyst allowed to trust?
-- Can the model issue actions or only suggestions?
-- How are outputs logged and reviewed?
-- What happens when the model is wrong?
+```text
+The file creates a scheduled task,
+writes to a startup directory,
+connects to an unknown IP address,
+and downloads a second executable.
+```
 
----
+### Advantages of dynamic analysis
 
-## 11. Deep learning and GenAI are not the same thing
+- Reveals actual behaviour
+- Useful against some obfuscation
+- Helps analysts understand attack chain
 
-Students should keep the distinction clear.
+### Limitations of dynamic analysis
 
-### Deep learning in analytics
-Often used for:
-- classification;
-- detection;
-- representation learning;
-- pattern recognition.
-
-### Generative AI
-Often used for:
-- text generation;
-- summarisation;
-- code assistance;
-- conversational support.
-
-A large language model is usually based on deep learning, but not all deep learning in cybersecurity is generative.
+- More expensive than static analysis
+- Malware may detect sandbox environments
+- Behaviour may depend on time, user action, or network conditions
+- Short analysis windows may miss delayed behaviour
 
 ---
 
-## 12. Lab guidance
+## 4.3 Behavioural Analysis
 
-### Suggested lab theme
-**AI-assisted alert analysis and critical evaluation**
+Behavioural analysis focuses on what the artefact or user does, rather than only what the artefact looks like.
 
-### Suggested tasks
-1. take a short set of alert or security text examples;
-2. use a guided AI workflow or simulation to summarise or classify them;
-3. compare AI-supported outputs with a manual or non-AI baseline;
-4. record strengths, weaknesses, and failure cases;
-5. reflect on whether the workflow is safe enough for operational use.
+Examples:
 
-### Suggested reflection questions
-- Did the model save time?
-- Did it miss important technical detail?
-- Did it invent anything?
-- Would you allow it to influence response actions?
-- What controls would you require before deployment?
+- Word document launches PowerShell
+- PowerShell downloads an executable
+- Executable injects into another process
+- Host queries rare domains periodically
+- Browser visits credential-harvesting page
+- User submits credentials to a suspicious domain
+
+Behavioural analysis is important because attackers can change surface features, but harmful behaviour may still follow recognisable patterns.
 
 ---
 
-## 13. Discussion questions
+# 5. AI Problem Framing
 
-1. When is deep learning justified in cybersecurity, and when is it unnecessary?
-2. Should LLMs be allowed to draft detection rules for production use?
-3. What is more dangerous in practice: hallucination or analyst overtrust?
-4. Which cyber tasks benefit most from natural-language models?
-5. Can generative AI improve security while also increasing security risk?
+## 5.1 Malware Detection as Classification
 
----
+Malware detection is often framed as binary classification:
 
-## 14. Key terms
+```text
+Input: file features
+Output: benign or malware
+```
 
-- Neural Network
-- Representation Learning
-- Embedding
-- Sequence Modelling
-- Malware Classification
-- NLP
-- Large Language Model
-- Hallucination
-- Human-in-the-Loop
-- AI-assisted Triage
+It can also be framed as multi-class classification:
+
+```text
+Input: file features
+Output: ransomware, trojan, worm, spyware, benign, etc.
+```
+
+Binary classification is simpler. Multi-class classification is more informative but harder.
 
 ---
 
-## 15. Week summary
+## 5.2 Phishing Detection as Classification
 
-This week introduced modern AI capabilities beyond classical machine learning.
+Phishing detection is commonly framed as classification:
 
-Students should now understand:
+```text
+Input: email, URL, sender, and content features
+Output: phishing or legitimate
+```
 
-- why deep learning is useful for complex cyber data;
-- how learned representations can help classification, clustering, and analysis;
-- where LLMs can support security work;
-- why GenAI must be used critically rather than blindly;
-- why human oversight remains central in security operations.
+The model may analyse:
 
-The next week turns the focus around: instead of asking how AI can help cybersecurity, it asks how AI systems themselves can be attacked and how they should be defended.
+- Sender
+- Subject line
+- Body text
+- Embedded links
+- Attachment metadata
+- Domain reputation
+- Urgency language
+- Login-page indicators
+
+---
+
+## 5.3 Malicious URL Detection
+
+Malicious URL detection may use:
+
+```text
+Input: URL lexical features + domain features + reputation features
+Output: benign, phishing, malware, suspicious, or unknown
+```
+
+The difficulty is that attackers can generate new domains quickly, use URL shorteners, compromise legitimate sites, or host phishing pages on trusted cloud platforms.
+
+---
+
+## 5.4 Risk Scoring
+
+Some systems do not make a hard decision. Instead, they assign a risk score.
+
+Example:
+
+```text
+URL risk score = 82/100
+```
+
+The risk score may consider:
+
+- Domain age
+- Domain reputation
+- URL length
+- Suspicious keywords
+- Number of redirects
+- Hosting provider
+- Threat-intelligence matches
+- Page similarity to known brands
+
+A risk score should be explainable.
+
+---
+
+# 6. Feature Engineering for Malware Detection
+
+## 6.1 Static Malware Features
+
+| Feature | Why It Matters |
+|---|---|
+| File hash | Useful for known malware matching |
+| File size | Extremely small or large files may be suspicious |
+| File type | Executable, script, document, archive |
+| PE header fields | Structure of Windows executable files |
+| Imported APIs | May reveal suspicious capabilities |
+| Strings | URLs, commands, registry paths, suspicious text |
+| Entropy | High entropy may suggest packing or encryption |
+| Section names | Unusual sections may indicate obfuscation |
+| Digital signature | Unsigned or invalid signatures may be suspicious |
+| Packer indicators | Packed malware may hide code |
+
+---
+
+## 6.2 Behavioural Malware Features
+
+| Feature | Why It Matters |
+|---|---|
+| Process creation | Malware may launch suspicious child processes |
+| File modification | Ransomware modifies many files |
+| Registry changes | Persistence may involve registry keys |
+| Network connections | Malware may contact C2 servers |
+| DNS queries | Malware may use suspicious domains |
+| Privilege escalation attempts | Malware may attempt higher privileges |
+| Security tool tampering | Malware may disable protection tools |
+| Persistence mechanisms | Malware may survive reboot |
+| Injection behaviour | Malware may inject code into other processes |
+| Encryption behaviour | Ransomware may encrypt many files |
+
+---
+
+## 6.3 Example: Static Feature Interpretation
+
+Consider this file:
+
+```text
+Filename: invoice_viewer.exe
+File type: Windows PE executable
+Digital signature: missing
+Entropy: high
+Imported APIs:
+- VirtualAlloc
+- WriteProcessMemory
+- CreateRemoteThread
+Strings:
+- http://45.77.x.x/update.bin
+- powershell -enc
+```
+
+Possible interpretation:
+
+```text
+The file is suspicious because it is unsigned, has high entropy, imports APIs often associated with process injection, and contains a URL and encoded PowerShell command.
+```
+
+However, this is not proof of malware. Some legitimate tools may use similar APIs.
+
+---
+
+# 7. Feature Engineering for Phishing Detection
+
+## 7.1 Email Header and Sender Features
+
+| Feature | Why It Matters |
+|---|---|
+| Sender domain | May not match claimed organisation |
+| Reply-to address | May differ from sender |
+| SPF/DKIM/DMARC result | Indicates email authentication status |
+| Display name mismatch | Sender name may impersonate trusted entity |
+| Sending IP reputation | Suspicious infrastructure may be used |
+| Time of sending | Some attacks occur outside normal patterns |
+
+---
+
+## 7.2 Email Content Features
+
+| Feature | Why It Matters |
+|---|---|
+| Urgency language | Creates pressure |
+| Credential request | Common phishing goal |
+| Generic greeting | May indicate mass phishing |
+| Grammar anomalies | May indicate suspicious origin |
+| Brand impersonation | Attackers mimic trusted organisations |
+| Attachment type | Macro documents or executables are risky |
+| Link text mismatch | Displayed link differs from actual URL |
+| Suspicious call to action | “Verify now”, “Reset immediately” |
+
+---
+
+## 7.3 URL Features in Phishing Emails
+
+| Feature | Why It Matters |
+|---|---|
+| Domain age | New domains are often suspicious |
+| URL length | Long URLs can hide intent |
+| Number of subdomains | Used to impersonate brands |
+| Use of IP address | Direct IP links can be suspicious |
+| HTTPS presence | Useful but not sufficient |
+| URL entropy | Random strings may indicate generated URLs |
+| Redirect count | Multiple redirects can hide destination |
+| Brand keywords | May indicate impersonation |
+
+---
+
+# 8. Feature Engineering for Malicious URL Detection
+
+Malicious URL detection may use three major feature groups.
+
+## 8.1 Lexical Features
+
+Lexical features are extracted from the URL string itself.
+
+Examples:
+
+| Feature | Example |
+|---|---|
+| URL length | Very long URL |
+| Number of dots | Many subdomains |
+| Special characters | `@`, `%`, `-`, `_` |
+| Suspicious keywords | login, verify, update, secure |
+| Digit ratio | Many digits in domain or path |
+| Entropy | Random-looking characters |
+| Use of IP address | `http://192.0.2.10/login` |
+
+---
+
+## 8.2 Host-Based Features
+
+Host-based features describe the domain or hosting environment.
+
+Examples:
+
+| Feature | Meaning |
+|---|---|
+| Domain age | Newly registered domain |
+| Registrar | Suspicious or uncommon registrar |
+| Hosting ASN | Hosting provider |
+| WHOIS privacy | Ownership hidden |
+| DNS records | A, MX, NS record patterns |
+| Certificate age | Recently issued certificate |
+| Reputation score | Known malicious or unknown |
+
+---
+
+## 8.3 Content-Based Features
+
+Content-based features describe what the webpage contains.
+
+Examples:
+
+| Feature | Meaning |
+|---|---|
+| Login form | May collect credentials |
+| Brand logo | May impersonate a known service |
+| JavaScript behaviour | Obfuscated or suspicious scripts |
+| External resources | Loads content from suspicious domains |
+| Form action URL | Sends credentials to unknown server |
+| Page similarity | Looks like a known brand page |
+
+---
+
+# 9. Case Study 1: Phishing Email
+
+## Scenario
+
+A student receives this email:
+
+```text
+Subject: URGENT: Verify your university account
+
+Dear user,
+
+Your university mailbox will be disabled today unless you verify your account.
+
+Click here to confirm your password:
+http://university-support-login.example-security-check.com
+
+Regards,
+IT Support Team
+```
+
+## Security Question
+
+Is this legitimate or phishing?
+
+## Possible Evidence
+
+| Evidence | Interpretation |
+|---|---|
+| Urgency language | Suspicious |
+| Generic greeting | Suspicious |
+| Password verification request | Suspicious |
+| Non-university domain | Suspicious |
+| No attachment | Neutral |
+| Claims to be IT Support | Possible impersonation |
+| HTTP rather than HTTPS | Suspicious, but HTTPS alone would not prove safety |
+
+## AI Framing
+
+```text
+Classification
+Risk scoring
+Human-in-the-loop review
+```
+
+## Main Lesson
+
+Phishing detection often requires combining language, URL, sender, and context features.
+
+---
+
+# 10. Case Study 2: Malware-Like Endpoint Behaviour
+
+## Scenario
+
+An endpoint monitoring system records this sequence:
+
+```text
+winword.exe launches powershell.exe
+powershell.exe runs an encoded command
+powershell.exe connects to unknown-domain.example
+powershell.exe downloads update.exe
+update.exe writes to startup folder
+```
+
+## Security Question
+
+Is this malware behaviour?
+
+## Evidence
+
+| Evidence | Interpretation |
+|---|---|
+| Word launches PowerShell | Suspicious |
+| Encoded PowerShell command | Suspicious |
+| Unknown domain | Suspicious |
+| Executable download | Suspicious |
+| Startup folder modification | Persistence attempt |
+
+## AI Framing
+
+```text
+Behavioural malware classification
+Anomaly detection
+Risk scoring
+```
+
+## Main Lesson
+
+A single event may not be enough, but a sequence of behaviours can strongly indicate malicious activity.
+
+---
+
+# 11. Case Study 3: Malicious URL or False Alarm?
+
+## Scenario
+
+A URL detector flags this link:
+
+```text
+https://secure-login-university.example-reset.com/account/verify
+```
+
+The model gives:
+
+```text
+Risk score: 84/100
+```
+
+## Risk-Increasing Evidence
+
+| Evidence | Interpretation |
+|---|---|
+| Contains “secure”, “login”, “verify” | Common phishing terms |
+| Contains “university” but not official domain | Possible impersonation |
+| Recently registered domain | Suspicious |
+| Login-related path | Credential-harvesting possibility |
+| Similar to legitimate brand | Possible brand impersonation |
+
+## Risk-Reducing Evidence
+
+| Evidence | Interpretation |
+|---|---|
+| HTTPS is present | Slightly reduces risk, but does not prove safety |
+| No known threat-intelligence match | Does not prove benign |
+| No malware download observed | May still be phishing |
+
+## Main Lesson
+
+A malicious URL detector should explain why a URL is risky. A score alone is not enough.
+
+---
+
+# 12. Dataset Awareness
+
+Datasets are important for learning and evaluation, but they have limitations.
+
+## 12.1 EMBER Dataset
+
+EMBER is a malware classification dataset based on features extracted from Windows Portable Executable files. The official repository describes EMBER as a collection of PE-file features designed as a benchmark dataset for researchers. Further reading: [EMBER dataset repository](https://github.com/elastic/ember).  
+
+Use case:
+
+```text
+Static malware detection from PE features
+```
+
+Possible limitation:
+
+```text
+The dataset contains derived features, not raw malware binaries. It is useful for ML benchmarking, but it does not fully represent complete malware analysis.
+```
+
+---
+
+## 12.2 PhishTank
+
+PhishTank is a collaborative clearing house for phishing data and provides an API for developers and researchers. Further reading: [PhishTank](https://www.phishtank.net/) and [PhishTank Developer Information](https://www.phishtank.net/developer_info.php).  
+
+Use case:
+
+```text
+Phishing URL detection and validation
+```
+
+Possible limitation:
+
+```text
+Phishing URLs change quickly. A dataset may become outdated, and confirmed phishing URLs may not represent all real-world phishing behaviour.
+```
+
+---
+
+## 12.3 URLhaus
+
+URLhaus is a platform from abuse.ch and Spamhaus for sharing malicious URLs used for malware distribution. Further reading: [URLhaus](https://urlhaus.abuse.ch/).  
+
+Use case:
+
+```text
+Malware URL detection and threat intelligence enrichment
+```
+
+Possible limitation:
+
+```text
+URLhaus focuses on URLs associated with malware distribution. It may not cover all phishing, scam, or credential-harvesting URLs.
+```
+
+---
+
+# 13. Dataset Limitations
+
+Public datasets are useful, but they should be used carefully.
+
+| Limitation | Explanation |
+|---|---|
+| Ageing | Malware and phishing tactics change quickly |
+| Label noise | Labels may be incorrect, incomplete, or delayed |
+| Sampling bias | Dataset may not represent real traffic or real users |
+| Class imbalance | Malicious examples may be rarer than benign ones |
+| Artefact leakage | Models may learn dataset-specific shortcuts |
+| Lack of context | Datasets often remove organisational context |
+| Adversarial change | Attackers adapt after detection methods become known |
+| Legal and ethical restrictions | Malware samples cannot always be shared freely |
+| Benign diversity | Benign software and legitimate emails are highly diverse |
+
+Important point:
+
+> A model that performs well on a public dataset may still fail in a real organisation.
+
+---
+
+# 14. Evaluation for Malware and Phishing Detection
+
+Evaluation should consider operational impact.
+
+## 14.1 Useful Metrics
+
+| Metric | Meaning |
+|---|---|
+| Accuracy | Overall proportion of correct predictions |
+| Precision | Of flagged items, how many are truly malicious? |
+| Recall | Of all malicious items, how many were detected? |
+| F1-score | Balance between precision and recall |
+| False positive rate | Benign items wrongly flagged |
+| False negative rate | Malicious items missed |
+| Detection latency | Time needed to detect |
+| Analyst review rate | How many items require human review |
+| Explainability | Whether analysts understand the result |
+| Evasion resistance | Whether attackers can easily bypass the model |
+
+---
+
+## 14.2 False Positives
+
+A false positive occurs when a benign item is flagged as malicious.
+
+Examples:
+
+- Legitimate email is quarantined.
+- Business file is blocked.
+- Software installer is flagged as malware.
+- Important URL is blocked.
+
+Possible consequences:
+
+- Lost productivity
+- User frustration
+- Analyst workload
+- Business disruption
+- Reduced trust in the security system
+
+---
+
+## 14.3 False Negatives
+
+A false negative occurs when a malicious item is missed.
+
+Examples:
+
+- Phishing email reaches user inbox.
+- Malware file is allowed to execute.
+- Malicious URL is not blocked.
+- Suspicious script is treated as benign.
+
+Possible consequences:
+
+- Credential theft
+- Malware infection
+- Data loss
+- Ransomware
+- Lateral movement
+- Financial or reputational damage
+
+---
+
+# 15. Why AI-Based Malware and Phishing Detection Is Difficult
+
+## 15.1 Attackers Adapt
+
+Attackers can change:
+
+- Email wording
+- Sender domains
+- URL structure
+- Hosting providers
+- File hashes
+- Malware packing
+- Command-and-control domains
+- Attachment types
+- Obfuscation methods
+
+This means models must be updated and monitored.
+
+---
+
+## 15.2 Obfuscation
+
+Obfuscation is the process of hiding the true purpose or structure of code or content.
+
+Examples:
+
+- Packed executables
+- Encoded PowerShell
+- Randomised variable names
+- Encrypted strings
+- URL encoding
+- Redirect chains
+- JavaScript obfuscation
+
+Obfuscation can make static analysis harder.
+
+---
+
+## 15.3 Concept Drift
+
+Concept drift occurs when the data distribution changes over time.
+
+Examples:
+
+- New phishing templates appear.
+- New malware families emerge.
+- Benign software updates change file features.
+- Organisations adopt new cloud tools.
+- Attackers change infrastructure.
+
+A model trained on old examples may lose effectiveness.
+
+---
+
+## 15.4 Explainability
+
+Security analysts need reasons.
+
+Poor explanation:
+
+```text
+Malware probability: 92%
+```
+
+Better explanation:
+
+```text
+Risk increased because:
+- File is unsigned.
+- Entropy is high.
+- Suspicious process injection APIs are imported.
+- The file contains an unknown download URL.
+- Behaviour includes persistence in startup folder.
+```
+
+Explainability helps analysts trust, validate, and challenge the model.
+
+---
+
+# 16. Week 3 Summary
+
+This week focused on AI for malware, phishing, and malicious URL detection.
+
+Key points:
+
+```text
+Malware, phishing, and malicious URLs are common entry points for cyberattacks.
+
+Static analysis examines artefacts without executing them.
+
+Dynamic analysis observes runtime behaviour.
+
+Behavioural analysis focuses on what the artefact or user does.
+
+Feature engineering is essential for AI-based artefact detection.
+
+Phishing detection combines sender, content, URL, and context features.
+
+Malicious URL detection uses lexical, host-based, reputation, and content features.
+
+Accuracy alone is not enough.
+
+Attackers adapt through obfuscation, domain changes, packing, and evasion.
+
+A useful AI detector should be explainable and operationally meaningful.
+```
+
+Final takeaway:
+
+> A strong AI-based malware or phishing detector is not simply the one with the highest benchmark score.  
+> It is the one that helps defenders make reliable, explainable, and proportionate security decisions.
+
+---
+
+# 17. Lab Sheet 3: Malware, Phishing, and Malicious URL Detection
+
+## Lab Overview
+
+In this lab, you will analyse simplified examples of suspicious emails, URLs, files, and endpoint behaviours. You will identify features, choose suitable AI framings, discuss false positives and false negatives, and design an explainable detection approach.
+
+This is a conceptual and analytical lab. No malware execution is required or allowed.
+
+---
+
+## Lab Safety Notice
+
+Do not download, execute, or visit suspicious files or URLs during this lab.
+
+All examples in this lab are simplified and should be treated as text-only learning artefacts.
+
+---
+
+## Lab Duration
+
+Approximate duration: 90 minutes.
+
+---
+
+## Lab Mode
+
+Individual work followed by small-group discussion.
+
+---
+
+## Lab Objectives
+
+By completing this lab, you should be able to:
+
+1. Identify phishing, malware, and malicious URL indicators.
+2. Extract useful static, behavioural, and URL-based features.
+3. Choose an appropriate AI problem framing.
+4. Discuss uncertainty in classification.
+5. Compare false positive and false negative costs.
+6. Propose explainable AI outputs for analysts.
+7. Critique public datasets for malware and phishing detection.
+
+---
+
+# 18. Lab Dataset A: Suspicious Artefacts
+
+Use the following simplified observations.
+
+| ID | Type | Observation |
+|---|---|---|
+| A1 | Email | Email says “Your account will be disabled today” and links to a non-university domain |
+| A2 | URL | `http://login-security-update-example.net/verify/account` |
+| A3 | File | Unsigned executable with high entropy and suspicious imports |
+| A4 | Endpoint | `winword.exe` launches `powershell.exe` with encoded command |
+| A5 | URL | Recently registered domain with random-looking path |
+| A6 | Email | Message from known lecturer with normal university domain and no links |
+| A7 | File | Signed software installer downloaded from official vendor website |
+| A8 | Endpoint | Script creates scheduled task and connects to unknown IP |
+| A9 | Email | Invoice attachment from unknown sender with macro-enabled document |
+| A10 | URL | Shortened URL redirects through multiple domains before reaching login page |
+
+---
+
+# 19. Lab Task 1 — Identify the Detection Domain
+
+For each artefact, identify the most relevant detection domain.
+
+Possible domains:
+
+- Phishing email detection
+- Malicious URL detection
+- Static malware detection
+- Behavioural malware detection
+- Endpoint anomaly detection
+- Benign or low-risk artefact
+- Uncertain
+
+Complete the table:
+
+| ID | Detection Domain | Reason |
+|---|---|---|
+| A1 |  |  |
+| A2 |  |  |
+| A3 |  |  |
+| A4 |  |  |
+| A5 |  |  |
+| A6 |  |  |
+| A7 |  |  |
+| A8 |  |  |
+| A9 |  |  |
+| A10 |  |  |
+
+---
+
+# 20. Lab Task 2 — Extract Features
+
+For each artefact, propose useful features.
+
+Examples:
+
+```text
+domain_age
+url_length
+url_entropy
+sender_reputation
+urgency_keyword_flag
+macro_enabled_attachment
+file_entropy
+digital_signature_status
+suspicious_import_count
+encoded_command_flag
+redirect_count
+```
+
+Complete the table:
+
+| ID | Feature 1 | Feature 2 | Feature 3 | Feature 4 |
+|---|---|---|---|---|
+| A1 |  |  |  |  |
+| A2 |  |  |  |  |
+| A3 |  |  |  |  |
+| A4 |  |  |  |  |
+| A5 |  |  |  |  |
+| A6 |  |  |  |  |
+| A7 |  |  |  |  |
+| A8 |  |  |  |  |
+| A9 |  |  |  |  |
+| A10 |  |  |  |  |
+
+---
+
+# 21. Lab Task 3 — Assign a Tentative Label
+
+Assign one of the following labels:
+
+```text
+Benign
+Suspicious
+Malicious
+Uncertain
+```
+
+Complete the table:
+
+| ID | Tentative Label | Reason | Additional Context Needed |
+|---|---|---|---|
+| A1 |  |  |  |
+| A2 |  |  |  |
+| A3 |  |  |  |
+| A4 |  |  |  |
+| A5 |  |  |  |
+| A6 |  |  |  |
+| A7 |  |  |  |
+| A8 |  |  |  |
+| A9 |  |  |  |
+| A10 |  |  |  |
+
+Remember:
+
+> “Uncertain” is acceptable if you can explain what evidence is missing.
+
+---
+
+# 22. Lab Task 4 — Choose AI Problem Framing
+
+For each detection problem, choose a suitable AI framing.
+
+Possible framings:
+
+```text
+Binary classification
+Multi-class classification
+Anomaly detection
+Risk scoring
+Clustering
+Human-in-the-loop review
+Rule-assisted ML
+```
+
+Complete the table:
+
+| Detection Problem | Suitable AI Framing | Reason |
+|---|---|---|
+| Phishing email detection |  |  |
+| Malicious URL detection |  |  |
+| Static malware detection |  |  |
+| Behavioural malware detection |  |  |
+| Endpoint anomaly detection |  |  |
+| Malware family grouping |  |  |
+| Attachment triage |  |  |
+| High-risk email review |  |  |
+
+---
+
+# 23. Lab Task 5 — Design an Explainable Risk Score
+
+Choose one of the following:
+
+```text
+Phishing email
+Malicious URL
+Malware file
+Endpoint behaviour
+```
+
+Design a risk score using 6–8 indicators.
+
+Complete the table:
+
+| Indicator | Score Contribution | Why It Matters |
+|---|---:|---|
+|  |  |  |
+|  |  |  |
+|  |  |  |
+|  |  |  |
+|  |  |  |
+|  |  |  |
+
+Define thresholds:
+
+| Score Range | Decision |
+|---|---|
+| 0–30 |  |
+| 31–60 |  |
+| 61–80 |  |
+| 81–100 |  |
+
+Your score should be explainable. Avoid using a score without reasons.
+
+---
+
+# 24. Lab Task 6 — False Positive and False Negative Costs
+
+Choose three artefacts from Lab Dataset A.
+
+Complete the table:
+
+| ID | False Positive Cost | False Negative Cost |
+|---|---|---|
+|  |  |  |
+|  |  |  |
+|  |  |  |
+
+Consider:
+
+- What happens if a benign item is wrongly blocked?
+- What happens if a malicious item is wrongly allowed?
+- Which error is more costly in this case?
+- Should the decision be automated or reviewed by a human?
+
+---
+
+# 25. Lab Task 7 — Evaluation Metrics
+
+A phishing detector is tested on 2,000 emails.
+
+Dataset:
+
+```text
+300 phishing emails
+1,700 benign emails
+```
+
+Model output:
+
+```text
+240 phishing emails correctly detected
+60 phishing emails missed
+170 benign emails wrongly flagged as phishing
+1,530 benign emails correctly ignored
+```
+
+Complete the confusion matrix:
+
+|  | Predicted Phishing | Predicted Benign |
+|---|---:|---:|
+| Actually Phishing |  |  |
+| Actually Benign |  |  |
+
+Then calculate:
+
+```text
+True positives =
+False negatives =
+False positives =
+True negatives =
+Precision =
+Recall =
+F1-score =
+Accuracy =
+False positive rate =
+False negative rate =
+```
+
+Then answer:
+
+1. Is the model more concerning because of false positives or false negatives?
+2. What would happen if this model were deployed in a university email system?
+3. Should the model automatically block emails, warn users, or send to human review?
+4. What additional evaluation would you request?
+
+---
+
+# 26. Lab Task 8 — Dataset Critique
+
+Choose one of the following resources:
+
+- EMBER
+- PhishTank
+- URLhaus
+
+Answer:
+
+1. What type of data does the resource provide?
+2. What security problem can it help study?
+3. What are its strengths?
+4. What are its limitations?
+5. Why might a model trained using this data fail in a real organisation?
+
+Use the official links in the Further Reading section.
+
+---
+
+# 27. Lab Deliverable
+
+Submit a short worksheet containing:
+
+1. Detection domain table.
+2. Feature extraction table.
+3. Tentative labels and uncertainty.
+4. AI problem framing table.
+5. Explainable risk score.
+6. False positive and false negative cost discussion.
+7. Evaluation metric calculations.
+8. Dataset critique.
+
+Recommended length:
+
+```text
+1000–1500 words
+```
+
+---
+
+# 28. Exercises
+
+## Exercise 1 — Concept Check
+
+Answer briefly.
+
+1. What is the difference between static and dynamic malware analysis?
+2. What is behavioural malware analysis?
+3. Why is phishing detection not only a text classification problem?
+4. Give four useful features for malicious URL detection.
+5. Why does HTTPS not prove that a website is safe?
+6. What is file entropy, and why may high entropy be suspicious?
+7. What is a false positive in malware detection?
+8. What is a false negative in phishing detection?
+9. Why can attackers evade hash-based detection?
+10. Why is explainability important for malware and phishing detection?
+
+---
+
+## Exercise 2 — Short Analytical Answer
+
+Write 250–300 words.
+
+**Question:**  
+Why is AI-based malware and phishing detection difficult in real-world environments?
+
+Your answer should discuss at least four of the following:
+
+- Obfuscation
+- Packing
+- URL changes
+- Domain rotation
+- Poor labels
+- Concept drift
+- False positives
+- False negatives
+- Human review
+- Dataset limitations
+
+---
+
+## Exercise 3 — Feature Design
+
+For each artefact type, propose four useful features.
+
+| Artefact Type | Feature 1 | Feature 2 | Feature 3 | Feature 4 |
+|---|---|---|---|---|
+| Phishing email |  |  |  |  |
+| Malicious URL |  |  |  |  |
+| Windows executable |  |  |  |  |
+| Macro-enabled document |  |  |  |  |
+| Suspicious PowerShell command |  |  |  |  |
+
+---
+
+## Exercise 4 — Case Analysis
+
+Read the case:
+
+```text
+An employee receives an email claiming to be from the finance department.
+The email contains an invoice attachment.
+The sender domain is similar to the company domain but not identical.
+The attachment is a macro-enabled Word document.
+The message says payment must be processed today.
+```
+
+Answer:
+
+1. Which features are suspicious?
+2. Which features would you extract for an AI model?
+3. Would this be classification, anomaly detection, or risk scoring?
+4. What additional context is needed?
+5. What would be a proportionate response?
+6. Should the system block the email automatically or send it for review?
+
+---
+
+## Exercise 5 — Evaluation Reflection
+
+A malware detector has:
+
+```text
+Accuracy: 97%
+Precision: 88%
+Recall: 45%
+```
+
+Answer:
+
+1. Why might this model be unacceptable?
+2. What does low recall mean in this case?
+3. What operational harm may result?
+4. What could be adjusted to improve recall?
+5. What trade-off might occur if recall improves?
+
+---
+
+## Exercise 6 — Explainability Practice
+
+Rewrite the following poor alert into an analyst-friendly explanation.
+
+Poor alert:
+
+```text
+Malware probability: 93%
+Prediction: malicious
+```
+
+Your explanation should include:
+
+- Risk-increasing evidence
+- Risk-reducing evidence
+- Missing evidence
+- Suggested next step
+- Whether automatic blocking is justified
+
+---
+
+# 29. Further Reading
+
+## Core Reading
+
+1. **MITRE ATT&CK: Phishing, T1566**  
+   Useful for understanding phishing as an adversary technique.  
+   <https://attack.mitre.org/techniques/T1566/>
+
+2. **EMBER Dataset Repository**  
+   Useful for static malware detection research using PE-file features.  
+   <https://github.com/elastic/ember>
+
+3. **PhishTank**  
+   Useful for studying phishing URLs and phishing intelligence.  
+   <https://www.phishtank.net/>
+
+4. **PhishTank Developer Information**  
+   Useful for understanding access to PhishTank data and API expectations.  
+   <https://www.phishtank.net/developer_info.php>
+
+5. **URLhaus by abuse.ch**  
+   Useful for malicious URL intelligence related to malware distribution.  
+   <https://urlhaus.abuse.ch/>
+
+6. **abuse.ch Threat Intelligence Projects**  
+   Useful for exploring URLhaus, ThreatFox, MalwareBazaar, and YARAify.  
+   <https://abuse.ch/>
+
+---
+
+## Suggested Search Topics
+
+Search for recent academic or technical material on:
+
+- Machine learning for malware detection
+- Static malware analysis
+- Dynamic malware analysis
+- Behavioural malware detection
+- Phishing detection using NLP
+- Malicious URL detection
+- URL lexical features
+- Explainable AI for malware detection
+- Adversarial malware examples
+- Malware packing and obfuscation
+- Concept drift in phishing detection
+- Human-in-the-loop phishing triage
+- Dataset bias in malware detection
+
+---
+
+# 30. Week 3 Summary
+
+This week focused on AI for malware, phishing, and malicious URL detection.
+
+The most important lessons are:
+
+```text
+Malware and phishing are common entry points for attacks.
+
+Static analysis examines artefacts without executing them.
+
+Dynamic analysis observes runtime behaviour.
+
+Behavioural analysis focuses on actions and sequences.
+
+Phishing detection combines sender, content, URL, and context features.
+
+Malicious URL detection uses lexical, host-based, content-based, and reputation features.
+
+Accuracy alone is not enough.
+
+Attackers adapt through obfuscation, packing, URL changes, and domain rotation.
+
+Useful AI detectors should support explainable and proportionate security decisions.
+```
+
+Final takeaway:
+
+> AI can help detect malicious artefacts, but effective detection requires meaningful features, careful evaluation, adversarial awareness, and security context.
