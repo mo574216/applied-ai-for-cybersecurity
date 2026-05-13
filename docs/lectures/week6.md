@@ -1,23 +1,40 @@
 ---
-title: "Week 6: Trustworthy, Adversarial, and Responsible AI in Cybersecurity"
+title: "Week 6: Explainable AI for Cybersecurity"
 layout: default
 permalink: /lectures/week6/
 ---
 
-# Week 6: Trustworthy, Adversarial, and Responsible AI in Cybersecurity  
-## Securing AI Systems and Using AI Responsibly in Cyber Defence
+# Week 6: Explainable AI for Cybersecurity  
+## From Model Scores to Analyst-Ready Evidence
 
 Welcome to Week 6 of **Applied AI for Cybersecurity**.
 
-In previous weeks, we studied how AI can support cybersecurity tasks such as intrusion detection, DDoS detection, phishing detection, malware detection, alert triage, and threat intelligence. This week asks a more critical question:
+In previous weeks, we studied how AI can be applied to cybersecurity data, network intrusion detection, DDoS detection, malware detection, phishing detection, malicious URL detection, and deep learning for cybersecurity.
 
-> What happens when the AI system itself becomes a target, a source of risk, or a poorly governed security decision-maker?
+This week focuses on a critical question:
 
-This week is the capstone of the course. It brings together the technical, operational, and ethical issues involved in deploying AI for cybersecurity.
+> If an AI system says something is malicious, how can a security analyst understand, trust, challenge, and act on that result?
 
-The main message is:
+This is the role of **Explainable AI**, often abbreviated as **XAI**.
 
-> AI can improve cyber defence, but AI systems must themselves be secured, evaluated, monitored, explained, and governed.
+The central lesson this week is:
+
+> In cybersecurity, an explanation is not only a technical add-on. It is part of the security decision process.
+
+A prediction such as:
+
+```text
+Malicious probability: 94%
+```
+
+is not enough for most security decisions. Analysts need to know:
+
+- What evidence increased the risk?
+- What evidence reduced the risk?
+- What context is missing?
+- How confident is the model?
+- What action is proportionate?
+- Could the explanation itself help an attacker evade detection?
 
 ---
 
@@ -25,853 +42,1036 @@ The main message is:
 
 By the end of this week, you should be able to:
 
-1. Explain what trustworthy AI means in a cybersecurity context.
-2. Describe why AI systems used in security can become attack targets.
-3. Distinguish between adversarial examples, evasion attacks, poisoning attacks, model extraction, and model inversion.
-4. Explain how attackers may manipulate AI-based phishing, malware, intrusion, or SOC systems.
-5. Discuss the risks of over-reliance on AI in security operations.
-6. Explain why explainability, robustness, privacy, accountability, and human oversight matter.
-7. Apply adversarial thinking to evaluate an AI-based cybersecurity system.
-8. Design basic controls for safer AI deployment in cybersecurity.
-9. Critically assess whether an AI security system is ready for operational deployment.
-10. Produce a responsible deployment checklist for an AI-based cyber defence use case.
+1. Explain why explainability matters in cybersecurity.
+2. Distinguish between interpretability, explainability, transparency, and accountability.
+3. Explain the difference between local and global explanations.
+4. Describe common explanation methods, including feature importance, surrogate models, LIME, SHAP, counterfactual explanations, and rule-based explanations.
+5. Explain how explanations support analysts in phishing, malware, intrusion detection, and SOC triage.
+6. Identify what makes an explanation useful or misleading.
+7. Discuss the security risks of explanations, including information leakage and evasion support.
+8. Design analyst-friendly explanations for AI cybersecurity outputs.
+9. Evaluate explanation quality using cybersecurity criteria.
+10. Explain why explainability must be connected to human oversight and response decisions.
 
 ---
 
-# 2. Why Trustworthy AI Matters in Cybersecurity
+# 2. Why Explainability Matters in Cybersecurity
 
-AI systems used in cybersecurity can influence important decisions:
+AI systems in cybersecurity may influence decisions such as:
 
-- Which email is blocked?
-- Which file is quarantined?
-- Which network flow is treated as malicious?
-- Which user is investigated?
-- Which alert is escalated?
-- Which host is isolated?
-- Which vulnerability is prioritised?
-- Which incident is treated as critical?
+- Blocking a URL
+- Quarantining an email
+- Isolating a host
+- Escalating an incident
+- Prioritising a vulnerability
+- Marking a user as high risk
+- Flagging a file as malware
+- Classifying traffic as DDoS
+- Assigning a SOC alert priority
 
-These decisions can affect users, business processes, legal responsibilities, and organisational trust.
+These decisions can affect users, services, business operations, privacy, and legal responsibility.
 
-A poorly designed AI security system may:
-
-- Miss real attacks
-- Produce too many false alarms
-- Block legitimate activity
-- Disrupt business operations
-- Leak sensitive information
-- Be manipulated by attackers
-- Produce explanations that mislead analysts
-- Encourage analysts to trust predictions without evidence
-
-This is why trustworthy AI is not an optional topic. In cybersecurity, the AI system becomes part of the defence surface.
-
----
-
-# 3. From “Using AI for Security” to “Securing AI for Security”
-
-So far, most of the course has focused on using AI to improve cyber defence.
-
-Examples:
-
-```text
-AI for phishing detection
-AI for malware classification
-AI for DDoS detection
-AI for SOC alert triage
-AI for threat intelligence enrichment
-```
-
-Week 5 changes the viewpoint:
-
-```text
-How can attackers manipulate these AI systems?
-How can defenders evaluate whether the AI is safe enough to deploy?
-How should human analysts use AI outputs responsibly?
-```
-
-This shift is important because an AI model is not just a tool. It is also a system that can be attacked, misused, misunderstood, or overtrusted.
-
----
-
-# 4. What Is Trustworthy AI?
-
-Trustworthy AI means that an AI system can be relied on within its intended context of use.
-
-In cybersecurity, trustworthy AI should be:
-
-| Property | Meaning in Cybersecurity |
-|---|---|
-| Valid | It measures or predicts what it claims to predict |
-| Reliable | It behaves consistently under expected conditions |
-| Robust | It resists small changes, noise, and manipulation |
-| Secure | It is protected from attacks on the model, data, and pipeline |
-| Explainable | Analysts can understand the reasons behind outputs |
-| Accountable | Humans and organisations remain responsible for decisions |
-| Privacy-preserving | Sensitive data is protected |
-| Fair and appropriate | It avoids unjustified harm to users or groups |
-| Monitored | It is observed after deployment |
-| Governed | It is managed through policies, roles, and controls |
-
-The NIST AI Risk Management Framework is a useful reference for thinking about trustworthy AI. NIST describes the AI RMF as a framework developed to help manage risks to individuals, organisations, and society associated with AI. Further reading: [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework).
-
----
-
-# 5. AI Risk in the Cybersecurity Lifecycle
-
-An AI-based cybersecurity system has several stages.
-
-```text
-Problem definition
-→ Data collection
-→ Data labelling
-→ Feature engineering
-→ Model training
-→ Model evaluation
-→ Deployment
-→ Monitoring
-→ Response integration
-→ Feedback and retraining
-```
-
-Each stage introduces risks.
-
-| Stage | Possible Risk |
-|---|---|
-| Problem definition | The wrong security question is modelled |
-| Data collection | Data is incomplete, biased, or sensitive |
-| Labelling | Labels are wrong or inconsistent |
-| Feature engineering | Features leak shortcuts or miss attacker behaviour |
-| Training | Model overfits to a dataset |
-| Evaluation | Metrics do not reflect operational risk |
-| Deployment | Model faces different traffic or users |
-| Monitoring | Concept drift is not detected |
-| Response integration | AI output triggers unsafe automation |
-| Feedback | Wrong analyst feedback corrupts future learning |
-
-A trustworthy system must manage risks across the whole lifecycle, not only during model training.
-
----
-
-# 6. Adversarial Machine Learning
-
-Adversarial machine learning studies how attackers can manipulate AI systems.
-
-In normal machine learning, we often assume that data comes from a stable distribution. In cybersecurity, this assumption is weak because attackers actively adapt.
-
-Examples:
-
-```text
-A malware author modifies a file to avoid detection.
-A phisher changes wording to bypass an email classifier.
-A botnet mimics normal traffic to avoid anomaly detection.
-An attacker poisons training data to weaken future detection.
-An attacker queries a model repeatedly to infer how it works.
-```
-
-MITRE ATLAS is a useful framework for studying adversary tactics and techniques against AI-enabled systems. MITRE describes ATLAS as a globally accessible knowledge base of adversary tactics and techniques against AI-enabled systems based on real-world attack observations. Further reading: [MITRE ATLAS](https://atlas.mitre.org/).
-
----
-
-# 7. Main Attack Types Against AI Systems
-
-## 7.1 Evasion Attacks
-
-An evasion attack happens at inference time. The attacker modifies the input so that the model makes a wrong prediction.
+A black-box prediction may be technically impressive but operationally weak.
 
 Example:
-
-```text
-Original malware: detected as malicious
-Modified malware: detected as benign
-```
-
-The attacker may change the file without changing its harmful function.
-
-Examples in cybersecurity:
-
-| Detection System | Evasion Example |
-|---|---|
-| Malware detector | Add benign-looking strings or pack the binary |
-| Phishing detector | Change wording, use images instead of text |
-| URL detector | Use redirects or trusted hosting platforms |
-| DDoS detector | Slow down traffic below thresholds |
-| IDS | Split attack traffic across time or sources |
-| SOC risk scoring | Avoid actions that strongly increase risk score |
-
-Important point:
-
-> Evasion attacks exploit the difference between what the model measures and what the attacker is actually doing.
-
----
-
-## 7.2 Adversarial Examples
-
-An adversarial example is an input intentionally modified to cause a model error.
-
-In image classification, adversarial examples are often small pixel changes. In cybersecurity, adversarial examples may look different:
-
-- Adding unused sections to a PE file
-- Changing domain names or URL paths
-- Rewording phishing emails
-- Padding network flows
-- Splitting activity across sessions
-- Changing command syntax
-- Reordering harmless operations
-
-Example:
-
-```text
-A phishing email still asks the user to verify credentials,
-but it avoids known suspicious keywords.
-```
-
-The security meaning remains malicious, but the model may no longer detect it.
-
----
-
-## 7.3 Poisoning Attacks
-
-A poisoning attack targets the training data.
-
-The attacker attempts to influence the model during training or retraining.
-
-Example:
-
-```text
-An attacker injects malicious examples labelled as benign into the training data.
-The model later learns that similar malicious behaviour is normal.
-```
-
-Possible poisoning targets:
-
-- Training datasets
-- Analyst feedback
-- User reports
-- Threat intelligence feeds
-- Crowdsourced labels
-- Federated learning updates
-- Auto-retraining pipelines
-
-Cybersecurity example:
-
-```text
-A spammer repeatedly reports phishing emails as legitimate.
-If the system learns from this feedback without validation, future phishing detection may weaken.
-```
-
----
-
-## 7.4 Backdoor Attacks
-
-A backdoor attack inserts hidden behaviour into a model.
-
-The model behaves normally on most inputs, but misclassifies inputs containing a specific trigger.
-
-Example:
-
-```text
-A malware detector works normally,
-except files containing a special harmless-looking string are classified as benign.
-```
-
-Backdoors are dangerous because normal evaluation may not reveal them.
-
-Potential sources:
-
-- Compromised training data
-- Untrusted pretrained models
-- Malicious third-party libraries
-- Poisoned model updates
-- Supply chain attacks
-
----
-
-## 7.5 Model Extraction
-
-Model extraction occurs when an attacker tries to copy or approximate a model by querying it repeatedly.
-
-Example:
-
-```text
-The attacker submits many URLs to a malicious URL detector.
-By observing outputs, the attacker learns which features increase or reduce risk.
-```
-
-Why this matters:
-
-- The attacker can build a substitute model.
-- The attacker can test evasion strategies.
-- The attacker can infer decision boundaries.
-- The attacker can reduce the cost of bypassing detection.
-
-Possible controls:
-
-- Rate limiting
-- Query monitoring
-- Output restriction
-- Authentication
-- Abuse detection
-- Returning coarse-grained outputs rather than detailed scores
-
----
-
-## 7.6 Model Inversion and Membership Inference
-
-Model inversion attempts to infer sensitive information about training data.
-
-Membership inference attempts to determine whether a specific record was included in the training data.
-
-Why this matters in cybersecurity:
-
-- Security datasets may contain sensitive logs.
-- Email datasets may contain private content.
-- Authentication records may expose user behaviour.
-- Malware analysis datasets may include proprietary samples.
-- Incident data may contain confidential organisational details.
-
-Privacy protection is important when using real security data.
-
----
-
-## 7.7 Prompt Injection and LLM-Specific Risks
-
-If large language models are used in security operations, they introduce additional risks.
-
-Examples:
-
-- A malicious email contains text that instructs the LLM to ignore previous instructions.
-- A threat report contains misleading content that affects summarisation.
-- A user asks the LLM to generate unsafe commands.
-- The LLM produces an incorrect incident summary.
-- The LLM overstates confidence.
-- The LLM leaks sensitive information from context.
-
-OWASP maintains a Top 10 list for Large Language Model Applications. The 2025 OWASP Top 10 for LLMs includes risks such as prompt injection and other risks across the development, deployment, and management lifecycle. Further reading: [OWASP Top 10 for LLM Applications](https://genai.owasp.org/llm-top-10/).
-
----
-
-# 8. Threat Model for AI-Based Cybersecurity Systems
-
-A threat model asks:
-
-> What are we protecting, from whom, and how might they attack it?
-
-For an AI-based cybersecurity system, we should consider:
-
-## 8.1 Assets
-
-| Asset | Example |
-|---|---|
-| Model | Malware classifier, IDS model, phishing detector |
-| Training data | Labelled emails, network flows, malware features |
-| Feature pipeline | Scripts extracting features from logs or files |
-| Labels | Analyst decisions, ground truth, threat intelligence |
-| Model outputs | Risk scores, classifications, explanations |
-| Feedback loop | Analyst feedback used for retraining |
-| Deployment environment | API, SIEM integration, endpoint agent |
-| Response actions | Blocking, quarantine, isolation, escalation |
-
-## 8.2 Adversaries
-
-Possible adversaries include:
-
-- Malware authors
-- Phishing operators
-- Botnet operators
-- Insider threats
-- External attackers
-- Malicious data contributors
-- Compromised users
-- Supply-chain attackers
-- Competitors or model thieves
-
-## 8.3 Attack Goals
-
-Attackers may want to:
-
-- Avoid detection
-- Cause false alarms
-- Weaken the model over time
-- Extract the model
-- Infer sensitive training data
-- Trigger unsafe automation
-- Reduce analyst trust
-- Overload the SOC
-- Hide malicious behaviour inside normal patterns
-
----
-
-# 9. Case Study 1: Evasion Against a Phishing Detector
-
-## Scenario
-
-A phishing detector uses features such as:
-
-```text
-urgency keywords
-password-related words
-known suspicious domains
-URL length
-sender reputation
-brand impersonation keywords
-```
-
-The attacker modifies the phishing email:
-
-```text
-Original phrase: "Your password will expire today."
-Modified phrase: "Your access needs a quick review."
-
-Original link: suspicious-login-example.com
-Modified link: cloud-docs.example-hosting.com/shared/file
-```
-
-The goal is to reduce the model score while still tricking the user.
-
-## Security Question
-
-Is the modified email less malicious, or only less detectable?
-
-## Discussion
-
-The email may still be malicious even if the model score decreases. This shows why defenders should evaluate whether features capture the true security behaviour or only surface patterns.
-
-## Main Lesson
-
-> A lower model score does not necessarily mean lower real-world risk.
-
----
-
-# 10. Case Study 2: Poisoning Through Analyst Feedback
-
-## Scenario
-
-A SOC system learns from analyst feedback.
-
-Analysts can mark alerts as:
-
-```text
-True positive
-False positive
-Benign
-Needs investigation
-```
-
-An attacker compromises several low-privilege accounts and generates suspicious but low-impact activity. The attacker then causes many alerts to be marked as false positives because analysts become used to seeing similar noisy behaviour.
-
-Later, the attacker uses similar behaviour for a real attack.
-
-## Security Question
-
-Can feedback become an attack surface?
-
-## Discussion
-
-Yes. If feedback is used for retraining without validation, the model may learn that suspicious behaviour is benign.
-
-## Possible Controls
-
-- Validate feedback before retraining
-- Separate training labels from operational closure reasons
-- Weight feedback by analyst confidence
-- Monitor for label distribution changes
-- Audit retraining data
-- Keep human-reviewed gold-standard datasets
-- Use delayed retraining rather than immediate learning
-
-## Main Lesson
-
-> Feedback loops improve AI systems, but they can also become poisoning channels.
-
----
-
-# 11. Case Study 3: Unsafe Automation in SOC Response
-
-## Scenario
-
-An AI-assisted SOC system assigns:
-
-```text
-Incident risk score: 94/100
-Recommendation: isolate server immediately
-```
-
-The server is a production database used by hospital staff.
-
-The evidence includes:
-
-```text
-unusual outbound connection
-unusual process execution
-high data transfer
-unknown destination
-```
-
-But the model lacks context:
-
-```text
-The hospital is performing an emergency data migration.
-The activity is approved but not recorded in the security calendar.
-```
-
-## Security Question
-
-Should the system automatically isolate the server?
-
-## Discussion
-
-Automatic isolation could interrupt a critical service. High-risk scores should not automatically trigger high-impact actions without human approval and operational context.
-
-## Main Lesson
-
-> The higher the impact of a response, the stronger the requirement for human approval, evidence quality, and context.
-
----
-
-# 12. Case Study 4: Model Extraction Against a Malicious URL Detector
-
-## Scenario
-
-A malicious URL detection API returns detailed outputs:
-
-```text
-Risk score: 86/100
-Reasons:
-- domain age: high risk
-- URL length: medium risk
-- suspicious keyword: high risk
-- reputation: unknown
-```
-
-An attacker submits thousands of test URLs and observes the outputs.
-
-## Security Question
-
-What can the attacker learn?
-
-## Possible Attacker Knowledge
-
-- Which keywords increase risk
-- Which URL lengths trigger alerts
-- Which domain ages are risky
-- Whether reputation matters
-- How to modify URLs to reduce score
-- Whether the detector uses lexical or reputation features
-
-## Possible Controls
-
-- Limit query rate
-- Monitor suspicious query patterns
-- Reduce output detail for untrusted users
-- Use authentication
-- Randomise or smooth outputs where appropriate
-- Avoid exposing internal feature weights
-- Separate user-facing explanations from internal model reasoning
-
-## Main Lesson
-
-> Explainability is important, but too much detail exposed to adversaries can help evasion.
-
----
-
-# 13. Responsible Deployment of AI in Cybersecurity
-
-A model should not be deployed only because it has good benchmark performance.
-
-Before deployment, ask:
-
-## 13.1 Security Fit
-
-- What security problem does the model solve?
-- Does the model output support a real decision?
-- What are the possible decisions after the prediction?
-- Who is responsible for the decision?
-- What is the cost of being wrong?
-
-## 13.2 Data Quality
-
-- Where did the data come from?
-- Are labels reliable?
-- Is the data representative of the target environment?
-- Is sensitive information protected?
-- Is the dataset balanced enough?
-- Are there known blind spots?
-
-## 13.3 Evaluation
-
-- Which metrics were used?
-- Were false positives and false negatives analysed?
-- Was the model tested on recent data?
-- Was the model tested on out-of-distribution examples?
-- Was adversarial evaluation performed?
-- Was detection latency measured?
-- Was analyst workload considered?
-
-## 13.4 Explainability
-
-- Can analysts understand the output?
-- Does the explanation show useful evidence?
-- Does the explanation include uncertainty?
-- Does the explanation show risk-increasing and risk-reducing factors?
-- Could the explanation leak too much information to attackers?
-
-## 13.5 Monitoring
-
-- How will model drift be detected?
-- How will false positives be tracked?
-- How will missed attacks be analysed?
-- How often will the model be reviewed?
-- Who approves retraining?
-- What logs are kept for audit?
-
-## 13.6 Governance
-
-- Who owns the model?
-- Who approves deployment?
-- Who can change thresholds?
-- Who reviews high-impact actions?
-- What is the rollback plan?
-- How is privacy protected?
-- How are incidents involving the AI system handled?
-
----
-
-# 14. Human Oversight and Automation Boundaries
-
-Not every AI-supported action should be automated.
-
-## 14.1 Lower-Risk Automation
-
-Often suitable for automation:
-
-- Enrich alerts with threat intelligence
-- Retrieve related logs
-- Generate incident summaries
-- Create investigation tickets
-- Group duplicate alerts
-- Recommend next steps
-- Apply temporary low-impact rate limits
-- Send low-risk notifications
-
-## 14.2 High-Risk Actions
-
-Usually require human approval:
-
-- Disable a user account
-- Isolate a production server
-- Block a country or major cloud provider
-- Delete files
-- Terminate cloud workloads
-- Revoke privileged access
-- Publicly disclose an incident
-- Notify regulators
-- Trigger ransomware recovery procedures
-
-## 14.3 Rule of Thumb
-
-```text
-The more irreversible, disruptive, or legally significant the action,
-the stronger the requirement for human approval.
-```
-
----
-
-# 15. Explainability and Analyst Trust
-
-Explainability should help analysts understand the evidence.
-
-Poor explanation:
 
 ```text
 Prediction: malicious
-Confidence: 93%
+Confidence: 96%
+```
+
+This output does not tell the analyst:
+
+- Why the model thinks the sample is malicious
+- Whether the evidence is strong or weak
+- Whether important context is missing
+- Whether a false positive would be costly
+- Whether the action should be automatic or require human approval
+
+A better AI output would be:
+
+```text
+Prediction: suspicious endpoint behaviour
+Confidence: medium-high
+
+Risk increased because:
+- winword.exe launched powershell.exe
+- PowerShell used an encoded command
+- The process contacted a newly registered domain
+- A new scheduled task was created
+
+Risk reduced because:
+- The endpoint belongs to the IT administration team
+- Some PowerShell activity is expected on this host
+
+Missing evidence:
+- Sandbox result for downloaded file
+- User confirmation
+- Threat intelligence status of the domain
+
+Recommended action:
+- Preserve logs
+- Submit file to sandbox
+- Escalate for analyst review
+- Do not isolate automatically unless further evidence appears
+```
+
+The second output supports investigation and decision-making.
+
+---
+
+# 3. Interpretability, Explainability, Transparency, and Accountability
+
+These terms are related but not identical.
+
+| Term | Meaning | Cybersecurity Example |
+|---|---|---|
+| Interpretability | The model itself is understandable | A small decision tree for phishing detection |
+| Explainability | The system provides reasons for an output | “Flagged because URL is newly registered and contains login keywords” |
+| Transparency | Information is available about data, model, and process | Documentation of features, training data, and limitations |
+| Accountability | Humans or organisations remain responsible for decisions | Analyst approval required before isolating a production server |
+
+## 3.1 Interpretable Model
+
+Some models are easier to understand by design.
+
+Examples:
+
+- Decision trees
+- Logistic regression
+- Rule lists
+- Small scoring models
+
+Example rule:
+
+```text
+IF domain_age < 7 days
+AND URL contains "login"
+AND sender domain does not match claimed organisation
+THEN phishing risk = high
+```
+
+This is interpretable because the reasoning is visible.
+
+## 3.2 Explainable Black-Box Model
+
+A black-box model may be difficult to understand internally, but explanation methods can estimate why it produced a specific output.
+
+Examples:
+
+- SHAP explanations
+- LIME explanations
+- Feature importance
+- Counterfactual explanations
+- Attention visualisation
+- Example-based explanations
+
+SHAP describes itself as a game-theoretic approach for explaining the output of machine learning models. It connects local explanations with Shapley values from cooperative game theory. Further reading: [SHAP documentation](https://shap.readthedocs.io/).
+
+LIME is designed to explain predictions of black-box classifiers by learning interpretable local surrogate models around individual predictions. Further reading: [LIME documentation](https://lime-ml.readthedocs.io/) and [LIME GitHub repository](https://github.com/marcotcr/lime).
+
+---
+
+# 4. What Makes Cybersecurity Explanations Different?
+
+Explainability in cybersecurity has special requirements.
+
+In ordinary classification, an explanation may answer:
+
+```text
+Why did the model classify this image as a cat?
+```
+
+In cybersecurity, an explanation must often support an operational decision:
+
+```text
+Should this host be isolated?
+Should this email be blocked?
+Should this alert be escalated?
+Should this user session be revoked?
+```
+
+Therefore, cybersecurity explanations must be:
+
+- Evidence-based
+- Actionable
+- Context-aware
+- Uncertainty-aware
+- Analyst-readable
+- Risk-sensitive
+- Operationally relevant
+- Safe to disclose
+
+## Important Difference
+
+A technically correct explanation may still be operationally poor.
+
+Example:
+
+```text
+The model classified the URL as malicious because token_17 had high weight.
+```
+
+This may be mathematically accurate but not useful to an analyst.
+
+Better:
+
+```text
+The URL is suspicious because it uses a newly registered domain, contains login-related terms, impersonates a university service, and redirects through two unrelated domains.
+```
+
+---
+
+# 5. Local and Global Explanations
+
+## 5.1 Local Explanation
+
+A local explanation explains one prediction.
+
+Example:
+
+```text
+Why was this specific email classified as phishing?
+```
+
+Useful for:
+
+- Analyst review
+- Incident investigation
+- User warning banners
+- Explaining individual alerts
+- Deciding whether to override a model
+
+Example:
+
+```text
+This email was flagged because:
+- sender domain does not match university domain
+- message contains urgent password reset language
+- link points to a newly registered domain
+- greeting is generic
+```
+
+## 5.2 Global Explanation
+
+A global explanation explains how the model generally behaves.
+
+Example:
+
+```text
+Which features usually influence this phishing detector?
+```
+
+Useful for:
+
+- Model validation
+- Governance
+- Audit
+- Debugging
+- Bias detection
+- Feature review
+- Security risk analysis
+
+Example:
+
+```text
+The phishing detector generally relies on:
+1. Domain reputation
+2. URL age
+3. Sender authentication result
+4. Link mismatch
+5. Urgency keywords
+```
+
+## 5.3 Why Both Are Needed
+
+Local explanations help with individual decisions.
+
+Global explanations help with model governance.
+
+A security team needs both.
+
+---
+
+# 6. Feature Importance
+
+Feature importance describes which input features most influence model predictions.
+
+Example for malicious URL detection:
+
+| Feature | Importance |
+|---|---:|
+| domain_age_days | High |
+| url_entropy | High |
+| redirect_count | Medium |
+| suspicious_keyword_count | Medium |
+| https_present | Low |
+| url_length | Medium |
+
+Feature importance can help analysts understand general model behaviour.
+
+## Limitations
+
+Feature importance may be misleading if:
+
+- Features are correlated
+- The model learned dataset artefacts
+- Importance is global but the analyst needs local explanation
+- The feature is not meaningful to analysts
+- The model relies on unstable features
+- Attackers can easily manipulate important features
+
+Example:
+
+If a malware model relies heavily on `source_folder_name`, it may indicate data leakage rather than real malware behaviour.
+
+---
+
+# 7. Surrogate Models
+
+A surrogate model is a simpler model trained to approximate a more complex model.
+
+Example:
+
+```text
+Complex model: deep neural network
+Surrogate model: small decision tree
+```
+
+The surrogate model is not the original model. It is an approximation.
+
+## Use Case
+
+A SOC team may use a complex model for alert prioritisation. A surrogate decision tree may help explain the general behaviour:
+
+```text
+IF asset criticality is high
+AND threat intelligence match exists
+AND endpoint suspicious behaviour is present
+THEN incident priority is high
+```
+
+## Limitations
+
+- The surrogate may not perfectly match the original model.
+- It may hide important complexity.
+- It can create false confidence.
+- It should be validated for fidelity.
+
+Fidelity means:
+
+```text
+How well does the explanation model approximate the original model?
+```
+
+---
+
+# 8. LIME
+
+LIME stands for **Local Interpretable Model-Agnostic Explanations**.
+
+The basic idea is:
+
+```text
+Take one prediction
+Perturb the input nearby
+Observe how the black-box model changes
+Train a simple local model
+Use that local model as the explanation
+```
+
+In simpler terms:
+
+> LIME tries to explain one decision by approximating the model near that specific input.
+
+## Example: Phishing Email
+
+Suppose a phishing detector flags an email.
+
+LIME may identify influential words or features:
+
+```text
+"urgent" → increases phishing risk
+"verify" → increases phishing risk
+unknown sender domain → increases phishing risk
+official university domain absent → increases phishing risk
+```
+
+## Strengths
+
+- Model-agnostic
+- Useful for individual predictions
+- Can be applied to text and tabular data
+- Often easier to understand than deep model internals
+
+## Limitations
+
+- Local explanations can be unstable
+- Results depend on perturbation strategy
+- May not reflect true model reasoning globally
+- Can be misleading if features are poorly designed
+- Analysts may overtrust the explanation
+
+Further reading:
+
+- LIME documentation:  
+  <https://lime-ml.readthedocs.io/>
+- LIME GitHub repository:  
+  <https://github.com/marcotcr/lime>
+
+---
+
+# 9. SHAP
+
+SHAP stands for **SHapley Additive exPlanations**.
+
+SHAP is based on Shapley values from cooperative game theory. The idea is to assign each feature a contribution to the model output.
+
+For one prediction, SHAP can show:
+
+```text
+Feature A increased the risk by +0.20
+Feature B reduced the risk by -0.05
+Feature C increased the risk by +0.15
+```
+
+## Example: Malicious URL Detection
+
+Prediction:
+
+```text
+URL risk score: 0.86
+```
+
+SHAP-style explanation:
+
+| Feature | Contribution |
+|---|---:|
+| domain_age_days = 2 | +0.24 |
+| url_contains_login = yes | +0.18 |
+| redirect_count = 3 | +0.13 |
+| domain_reputation = unknown | +0.10 |
+| https_present = yes | -0.03 |
+
+This tells the analyst what increased and reduced the score.
+
+## Strengths
+
+- Strong theoretical foundation
+- Supports local and global explanations
+- Useful for feature contribution analysis
+- Works with many model types
+
+## Limitations
+
+- Can be computationally expensive
+- Explanations depend on background data
+- Correlated features can complicate interpretation
+- Feature contributions may still be hard for analysts to understand
+- Explanations can expose model behaviour to attackers
+
+Further reading:
+
+- SHAP documentation:  
+  <https://shap.readthedocs.io/>
+- Introduction to explainable AI with Shapley values:  
+  <https://shap.readthedocs.io/en/latest/example_notebooks/overviews/An%20introduction%20to%20explainable%20AI%20with%20Shapley%20values.html>
+
+---
+
+# 10. Counterfactual Explanations
+
+A counterfactual explanation answers:
+
+> What minimum change would alter the model decision?
+
+Example:
+
+```text
+This URL would no longer be classified as high risk if:
+- the domain were older than 180 days
+- no login-related terms were present
+- redirect count were zero
+```
+
+Counterfactuals can help analysts understand decision boundaries.
+
+## Cybersecurity Use
+
+Counterfactual explanations may be useful for:
+
+- Debugging models
+- Understanding thresholds
+- Explaining why a vulnerability was prioritised
+- Understanding why a URL was blocked
+- Finding fragile model behaviour
+
+## Security Risk
+
+Counterfactuals can also help attackers.
+
+Example:
+
+```text
+To avoid detection, remove "verify", reduce URL entropy, and use an older domain.
+```
+
+Therefore, counterfactual explanations should be handled carefully.
+
+The level of explanation shown to internal analysts may be different from the explanation shown to external users.
+
+---
+
+# 11. Rule-Based Explanations
+
+Rule-based explanations express model logic as human-readable rules.
+
+Example:
+
+```text
+IF failed_login_count_5min > 10
+AND login_country is new
+AND device is unknown
+THEN account risk = high
+```
+
+Rule-based explanations are useful because security teams already use rules and policies.
+
+## Advantages
+
+- Easy to communicate
+- Good for audit
+- Compatible with security playbooks
+- Useful for analyst training
+- Good for simple risk scoring
+
+## Limitations
+
+- May oversimplify complex model behaviour
+- Can be brittle
+- Attackers may evade known rules
+- Hard to cover all variations of malicious behaviour
+
+---
+
+# 12. Example-Based Explanations
+
+Example-based explanations show similar past cases.
+
+Example:
+
+```text
+This alert resembles previous confirmed phishing cases because:
+- similar sender spoofing pattern
+- similar domain structure
+- similar urgent language
+- similar fake login page
+```
+
+Useful for:
+
+- Analyst training
+- Case comparison
+- Malware family similarity
+- Phishing campaign clustering
+- Threat intelligence enrichment
+
+## Risks
+
+- Similarity may be superficial
+- Past labels may be wrong
+- Old attacks may not represent current attacks
+- Similar examples may reveal sensitive incident data
+
+---
+
+# 13. Explanations for Different Cybersecurity Tasks
+
+## 13.1 Phishing Detection
+
+Poor output:
+
+```text
+Phishing probability: 91%
 ```
 
 Better explanation:
 
 ```text
 Risk increased because:
-- The file is unsigned.
-- The file has high entropy.
-- It imports process injection APIs.
-- It contacted a newly registered domain.
-- Similar behaviour was seen in previous malware cases.
+- sender domain does not match the claimed university identity
+- the email asks for password verification
+- the message uses urgent language
+- the link points to a newly registered domain
+- the greeting is generic
 
 Risk reduced because:
-- The file was downloaded from an internal software repository.
-- The host is used by the IT administration team.
+- no attachment is present
+- sender IP is not on a known blocklist
 
 Recommended action:
-- Send to sandbox analysis.
-- Do not delete automatically.
-- Escalate if runtime behaviour confirms persistence or C2.
+- quarantine the message
+- submit URL for analysis
+- search for similar emails
 ```
 
-Good explanations should include:
+---
 
-- Evidence used
-- Confidence
-- Uncertainty
-- Missing context
-- Risk-increasing factors
-- Risk-reducing factors
-- Recommended action
-- Automation boundary
+## 13.2 Malware Detection
+
+Poor output:
+
+```text
+Malware probability: 96%
+```
+
+Better explanation:
+
+```text
+Risk increased because:
+- file is unsigned
+- entropy is high
+- imports include process injection APIs
+- file contains suspicious command strings
+- runtime behaviour created persistence
+
+Missing evidence:
+- sandbox report
+- file origin
+- user download context
+
+Recommended action:
+- block execution
+- submit file to sandbox
+- search for the hash across endpoints
+```
 
 ---
 
-# 16. Privacy and Data Protection
+## 13.3 Network Intrusion Detection
 
-Cybersecurity data can contain sensitive information.
+Poor output:
 
-Examples:
+```text
+Attack probability: 88%
+```
 
-- Usernames
-- Email contents
-- IP addresses
-- Locations
-- Device identifiers
-- File names
-- URLs visited
-- Login behaviour
-- Cloud access logs
-- Incident notes
-- Analyst comments
+Better explanation:
 
-Privacy risks include:
+```text
+Risk increased because:
+- one host connected to 200 destination ports in 30 seconds
+- most connections failed
+- destination host is business-critical
+- source host has no approved scanning role
 
-- Over-collection
-- Unnecessary retention
-- Unauthorised access
-- Model memorisation
-- Sensitive data leakage through explanations
-- Re-identification
-- Misuse of monitoring data
+Risk reduced because:
+- no known malicious IP was involved
+- no exploitation payload was observed
 
-Responsible design should apply:
-
-- Data minimisation
-- Access control
-- Retention limits
-- Anonymisation or pseudonymisation where possible
-- Audit logging
-- Clear purpose limitation
-- Secure storage
-- Legal and organisational review
+Recommended action:
+- verify whether source host is an approved scanner
+- check recent vulnerability scanning schedule
+- escalate if not approved
+```
 
 ---
 
-# 17. Monitoring and Drift Management
+## 13.4 DDoS Detection
 
-AI systems must be monitored after deployment.
+Poor output:
 
-## 17.1 What to Monitor
+```text
+DDoS probability: 84%
+```
 
-| Monitoring Target | Why It Matters |
+Better explanation:
+
+```text
+Risk increased because:
+- request rate increased 20x within five minutes
+- API latency increased from 200 ms to 4 seconds
+- repeated requests targeted an expensive endpoint
+- payment gateway timeouts started
+
+Risk reduced because:
+- course registration opened at the same time
+- traffic countries match expected student audience
+
+Recommended action:
+- rate-limit the expensive endpoint
+- challenge suspicious sessions
+- avoid broad country blocking unless stronger evidence appears
+```
+
+---
+
+## 13.5 SOC Alert Triage
+
+Poor output:
+
+```text
+Incident priority: high
+```
+
+Better explanation:
+
+```text
+Priority is high because:
+- sensitive finance folder was accessed
+- large download occurred
+- endpoint executed encoded PowerShell
+- related domain appears in threat intelligence
+- host belongs to finance department
+
+Context reducing certainty:
+- user is travelling
+- some finance access may be expected
+
+Recommended action:
+- preserve logs
+- confirm user activity
+- isolate endpoint only after analyst approval
+```
+
+---
+
+# 14. Evaluating Explanation Quality
+
+An explanation should be evaluated, not accepted automatically.
+
+## Useful Criteria
+
+| Criterion | Question |
 |---|---|
-| False positive rate | Analyst workload and disruption |
-| False negative reports | Missed attacks |
-| Alert volume | Operational load |
-| Detection latency | Speed of response |
-| Feature distribution | Concept drift |
-| Model confidence | Overconfidence or uncertainty |
-| Analyst overrides | Trust and disagreement |
-| Threat landscape | New attacker behaviour |
-| Data pipeline health | Missing or broken logs |
-| Response outcomes | Whether actions worked |
+| Correctness | Does the explanation reflect the model’s actual behaviour? |
+| Fidelity | Does it approximate the model accurately? |
+| Usefulness | Does it help the analyst make a decision? |
+| Clarity | Is it understandable without ML expertise? |
+| Completeness | Does it include key evidence and missing context? |
+| Actionability | Does it suggest appropriate next steps? |
+| Uncertainty | Does it show confidence and limitations? |
+| Context-awareness | Does it include business/security context? |
+| Safety | Could the explanation help attackers evade detection? |
+| Consistency | Are similar cases explained similarly? |
 
-## 17.2 Drift Examples
+## Analyst-Centred Question
+
+The most important question is:
+
+> Does this explanation help a security analyst decide what to do next?
+
+If not, the explanation is insufficient.
+
+---
+
+# 15. Explanation Failure Modes
+
+Explanations can fail.
+
+| Failure Mode | Example |
+|---|---|
+| Too technical | “Feature 42 contributed +0.31” |
+| Too vague | “Suspicious behaviour detected” |
+| Misleading | Explanation highlights irrelevant feature |
+| Unstable | Similar inputs produce very different explanations |
+| Incomplete | Missing risk-reducing evidence |
+| Overconfident | No uncertainty shown |
+| Unsafe | Reveals exact evasion thresholds |
+| Not actionable | No recommended next step |
+| Context-blind | Ignores user role, asset value, or business event |
+
+## Example of Poor Explanation
 
 ```text
-A university introduces a new cloud platform.
-Login patterns change.
-A model trained on old identity logs flags many normal events as suspicious.
+Risk high because model confidence is high.
 ```
 
-```text
-Attackers change phishing templates.
-A phishing detector trained on old keywords misses new campaigns.
-```
+This is circular and unhelpful.
+
+## Better Explanation
 
 ```text
-Encrypted traffic increases.
-A network IDS relying on payload features becomes less useful.
+Risk is high because the host contacted a rare domain, downloaded an unknown executable, and created a scheduled task. The domain has no known reputation score, so confidence is medium rather than high.
+```
+
+---
+
+# 16. Explanation Risks and Security Trade-Offs
+
+Explainability has security benefits, but it also creates risks.
+
+## 16.1 Benefits
+
+- Helps analysts investigate
+- Reduces blind trust
+- Supports auditing
+- Improves model debugging
+- Helps identify data leakage
+- Supports human accountability
+- Improves incident documentation
+
+## 16.2 Risks
+
+- Attackers may learn evasion strategies
+- Explanations may expose sensitive features
+- Internal detection logic may leak
+- Users may overtrust explanations
+- Poor explanations may mislead analysts
+- Explanations may reveal confidential incident data
+
+## 16.3 Internal vs External Explanation
+
+Different audiences need different levels of detail.
+
+| Audience | Explanation Level |
+|---|---|
+| SOC analyst | Detailed evidence and context |
+| End user | Simple warning and safe action |
+| Manager | Business impact and priority |
+| Auditor | Governance and decision trail |
+| External party | Limited explanation to avoid leakage |
+
+Example:
+
+Internal analyst explanation:
+
+```text
+Flagged because URL contains login keyword, domain age is 2 days, redirect count is 4, and page similarity to known university login page is high.
+```
+
+End-user warning:
+
+```text
+This link appears suspicious and may impersonate a trusted service. Do not enter your password.
+```
+
+---
+
+# 17. XAI and Trustworthy AI
+
+Explainability is one property of trustworthy AI, but it is not enough by itself.
+
+A model can be explainable but still:
+
+- inaccurate
+- biased
+- insecure
+- privacy-invasive
+- poorly monitored
+- operationally unsafe
+
+NIST’s AI Risk Management Framework lists explainable and interpretable as part of trustworthy AI, alongside other characteristics such as validity, reliability, safety, security and resilience, accountability and transparency, privacy enhancement, and fairness with harmful bias managed. Further reading: [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework).
+
+DARPA’s Explainable AI programme aimed to create machine learning techniques that produce more explainable models while maintaining strong learning performance, and to help users understand, appropriately trust, and effectively manage AI systems. Further reading: [DARPA Explainable AI](https://www.darpa.mil/research/programs/explainable-artificial-intelligence).
+
+---
+
+# 18. Case Study 1: Explaining a Phishing Detector
+
+## Scenario
+
+A phishing detector flags the following email:
+
+```text
+Subject: Immediate mailbox verification required
+
+Dear user,
+
+Your university account will be disabled unless you verify your mailbox today.
+
+Click here:
+http://university-login-secure.example-reset.net/verify
+
+IT Support
+```
+
+Model output:
+
+```text
+Phishing probability: 93%
+```
+
+## Possible Explanation
+
+Risk-increasing evidence:
+
+```text
+urgent language
+generic greeting
+password/account verification request
+non-university domain
+login-related URL terms
+new or unknown domain
+```
+
+Risk-reducing evidence:
+
+```text
+no attachment
+no known malware URL match
+```
+
+Missing context:
+
+```text
+official IT campaign status
+sender authentication result
+whether other users received similar messages
+```
+
+Recommended action:
+
+```text
+quarantine email
+analyse URL safely
+search for similar messages
+warn affected users if campaign is confirmed
 ```
 
 ## Main Lesson
 
-> Deployment is not the end of the AI lifecycle. It is the beginning of operational monitoring.
+A phishing explanation should combine text, sender, URL, and organisational context.
 
 ---
 
-# 18. Course Integration: What We Have Learned
+# 19. Case Study 2: Explaining a Malware Classifier
 
-This course has covered five connected ideas.
+## Scenario
 
-| Week | Main Idea |
-|---|---|
-| Week 1 | Security problems must be translated carefully into AI problems |
-| Week 2 | Network intrusion and DDoS detection require context and robust evaluation |
-| Week 3 | Malware, phishing, and URL detection need meaningful features and adversarial awareness |
-| Week 4 | Security operations require alert correlation, prioritisation, and human oversight |
-| Week 5 | AI systems used in security must themselves be trustworthy, secure, monitored, and governed |
-
-The final skill is not just “using AI”.
-
-The final skill is:
+A malware classifier flags a file:
 
 ```text
-Designing, evaluating, and governing AI-supported cybersecurity decisions.
+filename: invoice_viewer.exe
+signature: unsigned
+entropy: high
+imports: VirtualAlloc, WriteProcessMemory, CreateRemoteThread
+strings: powershell -enc, http://unknown-domain.example/update.bin
 ```
+
+Model output:
+
+```text
+Malware probability: 96%
+```
+
+## Possible Explanation
+
+Risk-increasing evidence:
+
+```text
+file is unsigned
+high entropy suggests packing or encryption
+imports are associated with process injection
+contains encoded PowerShell string
+contains unknown download URL
+```
+
+Risk-reducing evidence:
+
+```text
+no sandbox result yet
+file origin unknown
+some administrative tools may use similar APIs
+```
+
+Recommended action:
+
+```text
+block execution temporarily
+submit to sandbox
+check whether file exists on other endpoints
+verify download source
+```
+
+## Main Lesson
+
+A good malware explanation should distinguish between suspicious indicators and proof of maliciousness.
 
 ---
 
-# 19. Week 5 Summary
+# 20. Case Study 3: Explanation Risk
 
-This week focused on trustworthy, adversarial, and responsible AI in cybersecurity.
+## Scenario
+
+A malicious URL detection service shows external users this explanation:
+
+```text
+Blocked because:
+- URL entropy > 4.2
+- domain age < 7 days
+- redirect count > 2
+- login keyword present
+```
+
+## Security Question
+
+Could this explanation help attackers?
+
+## Discussion
+
+Yes. The explanation reveals thresholds and feature logic that attackers may use to adjust URLs.
+
+Possible attacker changes:
+
+```text
+reduce entropy
+wait for domain age to increase
+reduce redirects
+avoid login keyword
+```
+
+## Safer External Explanation
+
+```text
+This link appears suspicious because it has characteristics commonly associated with credential theft. Do not enter your password.
+```
+
+## Main Lesson
+
+Explainability must be balanced with security. Internal analyst explanations can be detailed; external explanations may need to be limited.
+
+---
+
+# 21. Week 6 Summary
+
+This week focused on Explainable AI for Cybersecurity.
 
 Key points:
 
 ```text
-AI systems used in cybersecurity can themselves become attack targets.
+Cybersecurity decisions require reasons, not only scores.
 
-Attackers can evade, poison, extract, or manipulate AI models.
+Interpretability, explainability, transparency, and accountability are related but different.
 
-Prompt injection and LLM-specific risks matter when LLMs are used in security workflows.
+Local explanations explain one prediction.
 
-Trustworthy AI requires validity, reliability, robustness, security, explainability, privacy, monitoring, and accountability.
+Global explanations explain general model behaviour.
 
-Human oversight is essential for high-impact cybersecurity decisions.
+Feature importance, surrogate models, LIME, SHAP, counterfactuals, rules, and examples can all support explanation.
 
-Feedback loops must be protected from poisoning and misuse.
+Explanations must be useful to analysts, not only technically correct.
 
-Good benchmark performance is not enough for real-world deployment.
+Good explanations include risk-increasing evidence, risk-reducing evidence, missing context, uncertainty, and recommended next steps.
 
-Responsible deployment requires data quality checks, adversarial evaluation, monitoring, governance, and rollback planning.
+Explanations can also create security risks by revealing detection logic or helping attackers evade models.
+
+Explainability is part of trustworthy AI, but it does not replace accuracy, robustness, privacy, monitoring, or governance.
 ```
 
 Final takeaway:
 
-> AI can strengthen cyber defence only when it is itself secured, monitored, explainable, and governed.
+> A good cybersecurity explanation helps the analyst understand the evidence, judge uncertainty, and choose a proportionate response.
 
 ---
 
-# 20. Lab Sheet 5: Adversarial and Responsible AI for Cybersecurity
+# 22. Lab Sheet 6: Designing Analyst-Friendly Explanations
 
 ## Lab Overview
 
-In this lab, you will evaluate the trustworthiness and deployment readiness of AI-based cybersecurity systems. You will identify possible attacks against AI models, propose defensive controls, define automation boundaries, and prepare a responsible deployment checklist.
+In this lab, you will improve poor AI outputs by turning them into analyst-friendly explanations. You will identify evidence, uncertainty, missing context, and appropriate next steps.
 
-This lab is conceptual and analytical. It does not require attacking real systems or generating malicious artefacts.
-
----
-
-## Lab Safety Notice
-
-Do not attempt to attack real AI systems, bypass real detection tools, upload malicious files, or test evasion against public services.
-
-All scenarios are simplified for learning purposes.
+This lab focuses on explanation quality, not model training.
 
 ---
 
@@ -891,260 +1091,207 @@ Individual work followed by small-group discussion.
 
 By completing this lab, you should be able to:
 
-1. Identify possible adversarial attacks against AI-based cybersecurity tools.
-2. Distinguish evasion, poisoning, extraction, inversion, and unsafe automation risks.
-3. Assess whether an AI-based security system is ready for deployment.
-4. Propose controls for safer AI use in cybersecurity.
-5. Define human approval requirements for high-impact actions.
-6. Produce an explainable and responsible deployment checklist.
+1. Distinguish poor explanations from useful explanations.
+2. Identify risk-increasing and risk-reducing evidence.
+3. Add missing context and uncertainty.
+4. Design local explanations for individual cybersecurity predictions.
+5. Identify when explanations may create security risks.
+6. Produce analyst-ready explanations for phishing, malware, IDS, DDoS, and SOC triage cases.
 
 ---
 
-# 21. Lab Dataset A: AI Security System Scenarios
+# 23. Lab Dataset A: Poor AI Outputs
 
-Use the following simplified scenarios.
+Use the following simplified AI outputs.
 
-| ID | AI System | Scenario |
+| ID | AI Output | Context |
 |---|---|---|
-| S1 | Phishing detector | Attackers change wording and use image-based text to avoid keyword detection |
-| S2 | Malware classifier | Malware authors add benign-looking strings and pack the binary |
-| S3 | DDoS detector | Botnet sends slower traffic below detection threshold |
-| S4 | SOC alert triage | Model learns from analyst feedback, but many noisy malicious-like alerts are marked false positive |
-| S5 | URL detector API | Public API returns detailed risk reasons for submitted URLs |
-| S6 | IDS model | Model trained on public dataset performs poorly on encrypted enterprise traffic |
-| S7 | LLM SOC assistant | Malicious email contains instructions that manipulate the assistant’s summary |
-| S8 | Vulnerability prioritisation model | Model prioritises internet-facing assets but ignores internal crown-jewel systems |
-| S9 | Endpoint response system | High model score automatically isolates a production server |
-| S10 | Threat intelligence summariser | LLM summary omits uncertainty and overstates confidence |
+| X1 | `Phishing probability: 94%` | Email contains urgent account verification language and non-university URL |
+| X2 | `Malware probability: 96%` | File is unsigned, high entropy, imports process injection APIs |
+| X3 | `Attack probability: 88%` | Host connects to 150 ports in 40 seconds |
+| X4 | `DDoS probability: 84%` | Traffic increased sharply during official course registration |
+| X5 | `Incident priority: high` | Sensitive folder accessed, large download, user is confirmed travelling |
+| X6 | `URL risk: 91%` | URL uses newly registered domain and redirects twice |
+| X7 | `Account risk: 87%` | Login from new country, unknown device, MFA succeeded |
+| X8 | `Endpoint risk: 90%` | Word launched PowerShell and downloaded executable |
+| X9 | `Vulnerability priority: critical` | High CVSS, internet-facing server, patch available |
+| X10 | `Cloud activity risk: 82%` | Admin created access key outside normal hours |
 
 ---
 
-# 22. Lab Task 1 — Identify the AI Risk Type
+# 24. Lab Task 1 — Identify Why the Explanation Is Poor
 
-For each scenario, identify the most relevant risk type.
+For each output, explain what is missing.
 
-Possible risk types:
+Complete the table.
 
-```text
-Evasion
-Poisoning
-Backdoor
-Model extraction
-Model inversion / membership inference
-Prompt injection
-Concept drift
-Dataset bias
-Unsafe automation
-Poor explainability
-Privacy risk
-Governance failure
-```
-
-Complete the table:
-
-| ID | Risk Type | Reason |
-|---|---|---|
-| S1 |  |  |
-| S2 |  |  |
-| S3 |  |  |
-| S4 |  |  |
-| S5 |  |  |
-| S6 |  |  |
-| S7 |  |  |
-| S8 |  |  |
-| S9 |  |  |
-| S10 |  |  |
-
----
-
-# 23. Lab Task 2 — Analyse the Attacker Goal
-
-For each scenario, identify what the attacker or failure mode is trying to achieve.
-
-Possible goals:
-
-```text
-Avoid detection
-Cause false positives
-Poison future learning
-Extract model behaviour
-Trigger unsafe response
-Hide uncertainty
-Reduce analyst trust
-Steal sensitive information
-Manipulate explanation
-Exploit deployment mismatch
-```
-
-Complete the table:
-
-| ID | Attacker or Failure Goal | Possible Impact |
-|---|---|---|
-| S1 |  |  |
-| S2 |  |  |
-| S3 |  |  |
-| S4 |  |  |
-| S5 |  |  |
-| S6 |  |  |
-| S7 |  |  |
-| S8 |  |  |
-| S9 |  |  |
-| S10 |  |  |
-
----
-
-# 24. Lab Task 3 — Propose Defensive Controls
-
-For each scenario, propose at least two controls.
-
-Possible controls include:
-
-```text
-Adversarial testing
-Rate limiting
-Query monitoring
-Output restriction
-Human approval
-Feedback validation
-Drift monitoring
-Retraining governance
-Sandboxing
-Data validation
-Threat modelling
-Explainability review
-Access control
-Audit logging
-Rollback plan
-Independent evaluation
-```
-
-Complete the table:
-
-| ID | Control 1 | Control 2 | Additional Notes |
-|---|---|---|---|
-| S1 |  |  |  |
-| S2 |  |  |  |
-| S3 |  |  |  |
-| S4 |  |  |  |
-| S5 |  |  |  |
-| S6 |  |  |  |
-| S7 |  |  |  |
-| S8 |  |  |  |
-| S9 |  |  |  |
-| S10 |  |  |  |
-
----
-
-# 25. Lab Task 4 — Define Automation Boundaries
-
-For each action, decide whether it should be automated, require approval, or be prohibited.
-
-| Action | Automate / Approval / Prohibit | Reason |
-|---|---|---|
-| Enrich alert with threat intelligence |  |  |
-| Generate analyst summary |  |  |
-| Quarantine suspicious email |  |  |
-| Delete suspicious file |  |  |
-| Isolate production server |  |  |
-| Disable administrator account |  |  |
-| Apply temporary low-impact rate limit |  |  |
-| Block entire country |  |  |
-| Submit unknown file to sandbox |  |  |
-| Retrain model using analyst feedback |  |  |
-
-Consider:
-
-- Reversibility
-- Business impact
-- Confidence level
-- Evidence quality
-- Legal or privacy implications
-- Human accountability
-
----
-
-# 26. Lab Task 5 — Deployment Readiness Checklist
-
-Choose one AI cybersecurity system:
-
-```text
-Phishing detector
-Malware classifier
-DDoS detector
-SOC alert prioritisation model
-Vulnerability prioritisation model
-LLM SOC assistant
-```
-
-Prepare a deployment readiness checklist.
-
-Your checklist should include at least 12 items across these categories:
-
-| Category | Example Questions |
+| ID | What Is Missing From the Explanation? |
 |---|---|
-| Problem definition | What decision does the model support? |
-| Data quality | Is the training data representative? |
-| Labels | Are labels reliable? |
-| Evaluation | Were precision, recall, F1, and false positive rates checked? |
-| Adversarial testing | Was evasion or poisoning considered? |
-| Explainability | Can analysts understand the output? |
-| Privacy | Does the system process sensitive data? |
-| Monitoring | How will drift be detected? |
-| Human oversight | Which actions require approval? |
-| Governance | Who owns thresholds and retraining? |
-| Rollback | Can deployment be reversed? |
-| Audit | Are decisions logged? |
+| X1 |  |
+| X2 |  |
+| X3 |  |
+| X4 |  |
+| X5 |  |
+| X6 |  |
+| X7 |  |
+| X8 |  |
+| X9 |  |
+| X10 |  |
 
----
-
-# 27. Lab Task 6 — Explainability Review
-
-Review this poor AI output:
+Possible missing elements:
 
 ```text
-Risk score: 97/100
-Action: isolate host
+risk-increasing evidence
+risk-reducing evidence
+missing context
+uncertainty
+recommended action
+false positive cost
+false negative cost
+human approval requirement
+business impact
+threat intelligence status
 ```
 
-Rewrite it as an analyst-friendly output.
+---
 
-Your improved output should include:
+# 25. Lab Task 2 — Build an Analyst-Friendly Explanation
 
-1. Risk-increasing evidence.
-2. Risk-reducing evidence.
-3. Missing evidence.
-4. Confidence level.
-5. Recommended next step.
-6. Whether isolation requires human approval.
-7. Possible business impact.
-8. Suggested monitoring or follow-up.
+Choose five outputs from Dataset A.
+
+For each one, complete the template.
+
+| ID | Prediction | Risk-Increasing Evidence | Risk-Reducing Evidence | Missing Context | Recommended Next Step |
+|---|---|---|---|---|---|
+|  |  |  |  |  |  |
+|  |  |  |  |  |  |
+|  |  |  |  |  |  |
+|  |  |  |  |  |  |
+|  |  |  |  |  |  |
+
+Your explanations should be clear enough for a security analyst to use.
 
 ---
 
-# 28. Lab Task 7 — Final Critical Reflection
+# 26. Lab Task 3 — Local or Global Explanation?
 
-Write a short reflection answering:
+For each explanation need, decide whether a local or global explanation is more appropriate.
 
-1. What is the biggest risk of using AI in cybersecurity?
-2. What is the biggest benefit?
-3. Which AI security risk is most difficult to manage?
-4. Which response actions should never be fully automated?
-5. What should be monitored after deployment?
-6. What would make you trust an AI-based cybersecurity system?
+| Explanation Need | Local / Global / Both | Reason |
+|---|---|---|
+| Why was this email flagged? |  |  |
+| Which features usually influence the phishing model? |  |  |
+| Why was this host assigned high risk? |  |  |
+| Does the model rely too much on domain age? |  |  |
+| Why was this specific URL blocked? |  |  |
+| What kinds of traffic does the IDS usually misclassify? |  |  |
+| Why did the model miss this attack? |  |  |
+| Which features should be reviewed for leakage? |  |  |
 
 ---
 
-# 29. Lab Deliverable
+# 27. Lab Task 4 — Explanation Quality Evaluation
+
+Evaluate three explanations using the criteria below.
+
+| Criterion | Score 1–5 | Notes |
+|---|---:|---|
+| Clear |  |  |
+| Evidence-based |  |  |
+| Context-aware |  |  |
+| Shows uncertainty |  |  |
+| Actionable |  |  |
+| Safe to disclose |  |  |
+| Supports analyst decision |  |  |
+
+Use this table for three selected explanations.
+
+---
+
+# 28. Lab Task 5 — Explanation Risk Analysis
+
+Some explanations may help attackers.
+
+For each explanation, decide whether it is safe for:
+
+```text
+internal SOC analyst
+end user
+external public message
+attacker-facing API
+```
+
+Complete the table.
+
+| Explanation Detail | Internal Analyst | End User | Public Message | Attacker-Facing API | Risk |
+|---|---|---|---|---|---|
+| Exact threshold values |  |  |  |  |  |
+| Main suspicious features |  |  |  |  |  |
+| Full model feature weights |  |  |  |  |  |
+| General safety warning |  |  |  |  |  |
+| Detailed detection rule |  |  |  |  |  |
+| Recommended user action |  |  |  |  |  |
+| Known malicious indicator |  |  |  |  |  |
+
+---
+
+# 29. Lab Task 6 — Counterfactual Explanation
+
+Choose one case from Dataset A.
+
+Write a counterfactual explanation:
+
+```text
+This prediction would change if...
+```
+
+Then answer:
+
+1. Would this explanation help an analyst?
+2. Could it help an attacker?
+3. Should it be shown internally, externally, or not at all?
+4. What safer version could be shown to an end user?
+
+---
+
+# 30. Lab Task 7 — Explanation Template Design
+
+Design an explanation template for one of the following systems:
+
+```text
+phishing detector
+malware classifier
+IDS alert system
+DDoS detector
+SOC triage model
+vulnerability prioritisation system
+cloud risk scoring system
+```
+
+Your template should include:
+
+1. Prediction
+2. Confidence
+3. Risk-increasing evidence
+4. Risk-reducing evidence
+5. Missing context
+6. Recommended action
+7. Human approval requirement
+8. Explanation safety level
+
+---
+
+# 31. Lab Deliverable
 
 Submit a short worksheet containing:
 
-1. AI risk type classification.
-2. Attacker/failure goal analysis.
-3. Defensive controls table.
-4. Automation boundary table.
-5. Deployment readiness checklist.
-6. Improved analyst-friendly AI output.
-7. Final critical reflection.
+1. Missing-elements analysis for poor AI outputs.
+2. Five analyst-friendly explanations.
+3. Local/global explanation classification.
+4. Explanation quality evaluation.
+5. Explanation risk analysis.
+6. One counterfactual explanation.
+7. One reusable explanation template.
 
 Recommended length:
 
@@ -1154,22 +1301,22 @@ Recommended length:
 
 ---
 
-# 30. Exercises
+# 32. Exercises
 
 ## Exercise 1 — Concept Check
 
 Answer briefly.
 
-1. What is trustworthy AI?
-2. Why can AI systems used in cybersecurity become targets?
-3. What is an evasion attack?
-4. What is a poisoning attack?
-5. What is model extraction?
-6. What is membership inference?
-7. What is prompt injection?
-8. Why can feedback loops be dangerous?
-9. Why is explainability important in security operations?
-10. Why should high-impact response actions require human approval?
+1. What is the difference between interpretability and explainability?
+2. What is a local explanation?
+3. What is a global explanation?
+4. What is feature importance?
+5. What is a surrogate model?
+6. What is LIME?
+7. What is SHAP?
+8. What is a counterfactual explanation?
+9. Why can explanations help analysts?
+10. Why can explanations help attackers?
 
 ---
 
@@ -1178,158 +1325,153 @@ Answer briefly.
 Write 250–300 words.
 
 **Question:**  
-Why is adversarial machine learning especially important in cybersecurity?
+Why is explainability especially important in cybersecurity AI?
 
 Your answer should discuss at least four of the following:
 
-- Attackers adapt to defenders
-- Evasion
-- Poisoning
-- Model extraction
-- Concept drift
-- False positives and false negatives
-- Operational impact
-- Human oversight
-- Deployment monitoring
-
----
-
-## Exercise 3 — Threat Modelling
-
-Choose one AI cybersecurity system:
-
-```text
-Malware classifier
-Phishing detector
-DDoS detector
-SOC triage model
-LLM SOC assistant
-```
-
-Answer:
-
-1. What are the main assets?
-2. Who are the likely adversaries?
-3. What are the possible attack goals?
-4. How could the system be attacked?
-5. What controls would reduce the risk?
-6. What monitoring would be required after deployment?
-
----
-
-## Exercise 4 — Evasion Analysis
-
-Read the case:
-
-```text
-A phishing classifier relies heavily on urgency keywords and known suspicious domains.
-Attackers start using neutral language, image-based text, and trusted cloud-hosted pages.
-Detection performance drops sharply.
-```
-
-Answer:
-
-1. What type of adversarial behaviour is this?
-2. Which features failed?
-3. What additional features could help?
-4. What evaluation should be performed?
-5. How should the model be updated?
-6. What human review process is needed?
-
----
-
-## Exercise 5 — Responsible Automation
-
-Read the statement:
-
-```text
-If an AI system is 99% confident that a host is compromised, it should automatically isolate the host.
-```
-
-Do you agree or disagree?
-
-Write 250–300 words. Discuss:
-
-- Confidence versus evidence
-- Business impact
-- Asset criticality
-- Reversibility
-- Human approval
-- False positive cost
-- Incident urgency
+- Human decision-making
+- False positives
+- False negatives
+- Incident response
+- Analyst trust
 - Auditability
+- High-impact actions
+- Threat investigation
+- Explanation risks
+- Accountability
 
 ---
 
-## Exercise 6 — LLM Security Reflection
+## Exercise 3 — Explanation Rewriting
 
-A SOC uses an LLM to summarise alerts and recommend next steps.
+Rewrite the following poor output:
+
+```text
+Prediction: malicious
+Confidence: 95%
+Recommended action: block
+```
+
+Assume the case is a suspicious URL.
+
+Your improved explanation should include:
+
+- Risk-increasing evidence
+- Risk-reducing evidence
+- Missing context
+- Suggested next step
+- Whether automatic blocking is justified
+
+---
+
+## Exercise 4 — Local vs Global
+
+For each question, state whether it needs a local explanation, global explanation, or both.
+
+| Question | Local / Global / Both | Reason |
+|---|---|---|
+| Why was this specific file flagged as malware? |  |  |
+| Which features does the malware model usually rely on? |  |  |
+| Why did the IDS miss this specific attack? |  |  |
+| Does the phishing model overuse domain age? |  |  |
+| Why was this user session assigned high risk? |  |  |
+| Is the model learning dataset artefacts? |  |  |
+
+---
+
+## Exercise 5 — Explanation Risk
+
+Read the explanation:
+
+```text
+The URL was blocked because its entropy score was above 4.2,
+the domain age was below 7 days,
+and the redirect count was above 3.
+```
 
 Answer:
 
-1. What could go wrong?
-2. How could prompt injection occur?
-3. What sensitive data might be exposed?
-4. Why might analysts overtrust the output?
-5. What controls should be in place?
-6. Should the LLM be allowed to trigger response actions directly?
+1. Why is this explanation useful?
+2. Why might it be risky?
+3. Who should be allowed to see this level of detail?
+4. How would you rewrite it for an end user?
+5. How would you rewrite it for a SOC analyst?
 
 ---
 
-## Exercise 7 — Deployment Checklist
+## Exercise 6 — XAI Method Selection
 
-Create a responsible deployment checklist for one of the following:
+Choose a suitable explanation method for each situation.
+
+| Situation | Suitable Method | Reason |
+|---|---|---|
+| Explain one phishing prediction |  |  |
+| Understand overall IDS feature behaviour |  |  |
+| Approximate a complex malware model with simple rules |  |  |
+| Show what change would reduce a risk score |  |  |
+| Explain similar past phishing campaigns |  |  |
+| Audit whether a model relies on leaked features |  |  |
+
+Possible methods:
 
 ```text
-AI phishing detector
-AI malware detector
-AI DDoS detector
-AI vulnerability prioritisation system
-AI SOC assistant
+feature importance
+LIME
+SHAP
+surrogate model
+counterfactual explanation
+rule-based explanation
+example-based explanation
+global model audit
 ```
-
-Your checklist should cover:
-
-- Data
-- Labels
-- Metrics
-- Adversarial testing
-- Explainability
-- Privacy
-- Human oversight
-- Monitoring
-- Governance
-- Rollback
 
 ---
 
-# 31. Further Reading
+## Exercise 7 — Critical Reflection
+
+Write 200–300 words.
+
+**Question:**  
+Can explainability make cybersecurity AI less secure?
+
+Discuss:
+
+- Model leakage
+- Evasion
+- External explanations
+- Internal analyst needs
+- Safe explanation design
+- Difference between public and internal explanations
+
+---
+
+# 33. Further Reading
 
 ## Core Reading
 
-1. **NIST AI Risk Management Framework**  
-   Useful for understanding trustworthy AI, AI risk, governance, validity, reliability, safety, security, resilience, accountability, transparency, explainability, interpretability, and privacy.  
+1. **SHAP Documentation**  
+   Useful for understanding SHAP as a game-theoretic approach to explaining machine learning model outputs.  
+   <https://shap.readthedocs.io/>
+
+2. **SHAP: Introduction to Explainable AI with Shapley Values**  
+   Useful for a practical introduction to Shapley-value-based explanations.  
+   <https://shap.readthedocs.io/en/latest/example_notebooks/overviews/An%20introduction%20to%20explainable%20AI%20with%20Shapley%20values.html>
+
+3. **LIME Documentation**  
+   Useful for understanding Local Interpretable Model-Agnostic Explanations.  
+   <https://lime-ml.readthedocs.io/>
+
+4. **LIME GitHub Repository**  
+   Useful for examples and implementation details.  
+   <https://github.com/marcotcr/lime>
+
+5. **NIST AI Risk Management Framework**  
+   Useful for connecting explainability and interpretability to broader trustworthy AI risk management.  
    <https://www.nist.gov/itl/ai-risk-management-framework>
 
-2. **NIST AI RMF Resources**  
-   Useful for additional AI RMF material, playbook resources, and trustworthiness considerations.  
-   <https://airc.nist.gov/airmf-resources/airmf/>
-
-3. **MITRE ATLAS**  
-   Useful for understanding adversary tactics and techniques against AI-enabled systems.  
-   <https://atlas.mitre.org/>
-
-4. **OWASP Machine Learning Security Top 10**  
-   Useful for understanding common security risks in machine learning systems.  
-   <https://owasp.org/www-project-machine-learning-security-top-10/>
-
-5. **OWASP Top 10 for Large Language Model Applications**  
-   Useful for understanding LLM-specific security risks such as prompt injection and risks across the development, deployment, and management lifecycle.  
-   <https://genai.owasp.org/llm-top-10/>
-
-6. **MITRE SAFE-AI: A Framework for Securing AI-Enabled Systems**  
-   Useful for defensive thinking about securing enterprise systems that use AI.  
-   <https://atlas.mitre.org/pdf-files/SAFEAI_Full_Report.pdf>
+6. **DARPA Explainable Artificial Intelligence Programme**  
+   Useful for understanding the original motivation behind XAI: helping users understand, appropriately trust, and manage AI systems.  
+   <https://www.darpa.mil/research/programs/explainable-artificial-intelligence>
 
 ---
 
@@ -1337,55 +1479,50 @@ Your checklist should cover:
 
 Search for recent academic or technical material on:
 
-- Adversarial machine learning in cybersecurity
-- Evasion attacks against malware classifiers
-- Poisoning attacks against intrusion detection
-- Prompt injection in security operations
-- Model extraction attacks
-- Model inversion and membership inference
 - Explainable AI for cybersecurity
-- Privacy-preserving security analytics
-- Secure ML pipelines
-- Human-in-the-loop AI for cyber defence
-- AI governance for cybersecurity
-- Robust malware detection
-- Robust phishing detection
-- Drift monitoring for security models
-- AI red teaming
-- Secure deployment of machine learning models
+- XAI for intrusion detection
+- SHAP for malware detection
+- LIME for phishing detection
+- Counterfactual explanations in cybersecurity
+- Explainable deep learning for security
+- Analyst-centred explanations
+- Explanation risks in cybersecurity
+- Model leakage through explanations
+- Explainable AI for SOC triage
+- Explainability and adversarial evasion
+- Human trust in AI-based cybersecurity systems
 
 ---
 
-# 32. Week 5 Summary and Course Wrap-Up
+# 34. Week 6 Summary
 
-This week completed the course by focusing on the risks of AI itself.
+This week focused on Explainable AI for Cybersecurity.
 
 The most important lessons are:
 
 ```text
-AI systems used in cybersecurity are themselves part of the attack surface.
+Cybersecurity AI needs reasons, not only predictions.
 
-Attackers can evade, poison, extract, or manipulate AI models.
+Interpretability, explainability, transparency, and accountability are related but different.
 
-LLM-based security tools introduce risks such as prompt injection and overreliance.
+Local explanations explain individual predictions.
 
-Trustworthy AI requires security, robustness, explainability, privacy, monitoring, governance, and accountability.
+Global explanations explain overall model behaviour.
 
-High benchmark performance does not guarantee safe deployment.
+LIME and SHAP are common model-agnostic explanation approaches.
 
-Human oversight is essential for high-impact cybersecurity decisions.
+Counterfactual explanations show what changes could alter a decision.
 
-Responsible AI deployment requires threat modelling, adversarial testing, monitoring, and rollback planning.
-```
+Explanations must be clear, evidence-based, context-aware, actionable, and uncertainty-aware.
 
-Across the course, the central lesson is:
+Explanations can also create security risks if they expose detection logic.
 
-```text
-AI should not be treated as an automatic security authority.
-AI should be treated as a decision-support technology that must be evaluated, explained, monitored, and governed.
+Different audiences need different levels of explanation.
+
+Explainability is part of trustworthy AI, but it does not replace robustness, monitoring, privacy, or governance.
 ```
 
 Final takeaway:
 
-> Applied AI for Cybersecurity is not only about detecting threats with models.  
-> It is about designing AI-supported security decisions that are technically sound, operationally useful, adversarially robust, and responsibly governed.
+> The best explanation is not the most mathematically detailed one.  
+> The best explanation is the one that helps a security analyst make a better, safer, and more proportionate decision.
