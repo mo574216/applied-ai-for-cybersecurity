@@ -1,10 +1,10 @@
 ---
-title: "Week 6: Explainable AI for Cybersecurity"
+title: "Week 06: Explainable AI for Cybersecurity"
 layout: default
-permalink: /lectures/week6/
+permalink: /lectures/week06/
 ---
 
-# Week 6: Explainable AI for Cybersecurity  
+# Week 06: Explainable AI for Cybersecurity  
 ## From Model Scores to Analyst-Ready Evidence
 
 Welcome to Week 6 of **Applied AI for Cybersecurity**.
