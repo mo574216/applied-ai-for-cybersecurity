@@ -1,5 +1,5 @@
 ---
-title: "Week 5: Trustworthy, Adversarial, and Responsible AI in Cybersecurity"
+title: "Week 6: Trustworthy, Adversarial, and Responsible AI in Cybersecurity"
 layout: default
 permalink: /lectures/week6/
 ---
