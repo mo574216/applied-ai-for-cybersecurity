@@ -1,13 +1,13 @@
 ---
-title: "Week 3: AI for Malware, Phishing, and Malicious URL Detection"
+title: "Week 4: AI for Malware, Phishing, and Malicious URL Detection"
 layout: default
 permalink: /lectures/week4-1/
 ---
 
-# Week 3: AI for Malware, Phishing, and Malicious URL Detection  
+# Week 4: AI for Malware, Phishing, and Malicious URL Detection  
 ## From Digital Artefacts to Threat Classification
 
-Welcome to Week 3 of **Applied AI for Cybersecurity**.
+Welcome to Week 4 of **Applied AI for Cybersecurity**.
 
 In Week 1, we studied the foundations of applying AI to cybersecurity problems. In Week 2, we focused on network intrusion and DDoS detection. This week moves from network traffic to another major area of cyber defence:
 
