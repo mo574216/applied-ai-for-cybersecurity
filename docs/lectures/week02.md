@@ -1,10 +1,10 @@
 ---
-title: "Week 2: Cybersecurity Data Engineering and Feature Design"
+title: "Week 02: Cybersecurity Data Engineering and Feature Design"
 layout: default
-permalink: /lectures/week2/
+permalink: /lectures/week02/
 ---
 
-# Week 2: Cybersecurity Data Engineering and Feature Design  
+# Week 02: Cybersecurity Data Engineering and Feature Design  
 ## From Raw Security Evidence to AI-Ready Data
 
 Welcome to Week 2 of **Applied AI for Cybersecurity**.
