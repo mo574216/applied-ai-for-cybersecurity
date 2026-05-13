@@ -1,7 +1,7 @@
 ---
 title: "Week 2: Cybersecurity Data Engineering and Feature Design"
 layout: default
-permalink: /lectures/week2/
+permalink: /lectures/week2-1/
 ---
 
 # Week 2: Cybersecurity Data Engineering and Feature Design  
