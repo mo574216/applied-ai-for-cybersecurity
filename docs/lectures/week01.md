@@ -1,10 +1,10 @@
 ---
-title: "Week 1: Introduction to Applied AI for Cybersecurity"
+title: "Week 01: Introduction to Applied AI for Cybersecurity"
 layout: default
 permalink: /lectures/week1/
 ---
 
-# Week 1: Introduction to Applied AI for Cybersecurity  
+# Week 01: Introduction to Applied AI for Cybersecurity  
 ## From Security Data to AI-Driven Decisions
 
 Welcome to Week 1 of **Applied AI for Cybersecurity**.
